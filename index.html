@@ -2,1048 +2,1071 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TuProfe20 Lab - Gráficos Estadísticos II</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TuProfe20 MathLab - Estadística Interactiva</title>
     
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    
-    <!-- KaTeX para rendering matemático exacto -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-    
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        fun: ['Nunito', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap');
+        body { margin: 0; padding: 0; overflow: hidden; user-select: none; }
+        .custom-scrollbar::-webkit-scrollbar { width: 8px; height: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; border: 2px solid white; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         
-        * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
-        body { margin: 0; padding: 0; overflow: hidden; width: 100vw; height: 100dvh; user-select: none; background: #1e1b4b; }
-        .font-fun { font-family: 'Nunito', sans-serif; }
+        /* ESTILOS METÁLICOS VIBRANTES PARA CARTELES DE PREMIO */
+        .metallic-gold {
+            background: linear-gradient(135deg, #fef08a 0%, #eab308 40%, #fef08a 60%, #a16207 100%);
+            border: 4px solid #fef08a;
+            box-shadow: inset 0 0 25px rgba(255,255,255,0.9), 0 15px 45px rgba(234, 179, 8, 0.7);
+            color: #422006;
+        }
+        .metallic-silver {
+            background: linear-gradient(135deg, #f8fafc 0%, #cbd5e1 40%, #f8fafc 60%, #64748b 100%);
+            border: 4px solid #ffffff;
+            box-shadow: inset 0 0 25px rgba(255,255,255,0.9), 0 15px 45px rgba(148, 163, 184, 0.7);
+            color: #0f172a;
+        }
+        .metallic-text-gold { text-shadow: 1px 2px 0px rgba(255,255,255,0.6), -1px -1px 0px rgba(0,0,0,0.15); }
+        .metallic-text-silver { text-shadow: 1px 2px 0px rgba(255,255,255,0.8), -1px -1px 0px rgba(0,0,0,0.2); }
+
+        @keyframes gradient-x { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+        .animate-gradient-x { background-size: 200% 200%; animation: gradient-x 10s ease infinite; }
         
-        @keyframes floatUp { 
-            0% { transform: translateY(105vh) rotate(0deg); } 
-            100% { transform: translateY(-105vh) rotate(360deg); } 
-        }
-        @keyframes slideInRight { 
-            0% { opacity: 0; transform: translateX(12px); } 
-            100% { opacity: 1; transform: translateX(0); } 
-        }
-        @keyframes confettiExplosion { 
-            0% { transform: translate(0, 0) scale(1) rotate(0deg); opacity: 1; } 
-            80% { opacity: 1; } 
-            100% { transform: translate(var(--tx), var(--ty)) scale(0) rotate(var(--rot)); opacity: 0; } 
-        }
-        @keyframes jellyPop {
-            0% { transform: scale3d(.85, .85, .85); opacity: 0; }
-            45% { transform: scale3d(1.04, 1.04, 1.04); opacity: 1; }
-            75% { transform: scale3d(.98, .98, .98); }
-            100% { transform: scale3d(1, 1, 1); opacity: 1; }
-        }
-        @keyframes robotFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
-        @keyframes robotJump { 0%, 100% { transform: translateY(0); } 30% { transform: translateY(-12px); } }
-
-        .scrollbar-hide::-webkit-scrollbar { display: none; }
-        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
-
+        @keyframes floatUp { 0% { transform: translateY(100vh) rotate(0deg); } 100% { transform: translateY(-100vh) rotate(360deg); } }
+        @keyframes slideInRight { 0% { opacity: 0; transform: translateX(20px); } 100% { opacity: 1; transform: translateX(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes confettiExplosion { 0% { transform: translate(0, 0) scale(1) rotate(0deg); opacity: 1; } 80% { opacity: 1; } 100% { transform: translate(var(--tx), var(--ty)) scale(0) rotate(var(--rot)); opacity: 0; } }
+        @keyframes jellyPop { 0% { transform: scale3d(.3, .3, .3); opacity: 0; } 20% { transform: scale3d(1.15, 1.15, 1.15); } 40% { transform: scale3d(.9, .9, .9); } 60% { transform: scale3d(1.05, 1.05, 1.05); opacity: 1; } 80% { transform: scale3d(.97, .97, .97); } 100% { transform: scale3d(1, 1, 1); opacity: 1; } }
+        @keyframes wiggle { 0%, 100% { transform: rotate(-6deg); } 50% { transform: rotate(6deg) scale(1.08); } }
+        @keyframes robotFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+        @keyframes robotThinkTilt { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(8deg) translateY(-4px); } }
+        @keyframes robotJump { 0%, 100% { transform: translateY(0); } 30% { transform: translateY(-18px); } }
+        @keyframes robotTalkArmL { 0%, 100% { transform: rotate(45deg); } 50% { transform: rotate(100deg); } }
+        @keyframes robotTalkArmR { 0%, 100% { transform: rotate(-45deg); } 50% { transform: rotate(-100deg); } }
+        
         .animate-floatUp { animation: floatUp linear infinite; }
-        .animate-slideInRight { animation: slideInRight 0.25s ease-out forwards; }
-        .animate-confettiExplosion { animation: confettiExplosion 1.6s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
-        .animate-jellyPop { animation: jellyPop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-        .animate-robotFloat { animation: robotFloat 2.8s ease-in-out infinite; }
+        .animate-slideInRight { animation: slideInRight 0.3s ease-out forwards; }
+        .animate-fadeIn { animation: fadeIn 0.35s ease-out forwards; }
+        .animate-confettiExplosion { animation: confettiExplosion 1.8s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
+        .animate-jellyPop { animation: jellyPop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        .animate-wiggle { animation: wiggle 0.25s ease-in-out 3; }
+        .animate-robotFloat { animation: robotFloat 3s ease-in-out infinite; }
+        .animate-robotThinkTilt { animation: robotThinkTilt 2s ease-in-out infinite; }
         .animate-robotJump { animation: robotJump 0.9s cubic-bezier(0.28, 0.84, 0.42, 1) infinite; }
-
-        /* KaTeX Grande y Nítido sin desbordes */
-        .katex { font-weight: 900 !important; }
-        .katex-display { margin: 0 !important; padding: 0 !important; overflow-x: auto; overflow-y: hidden; }
-        
-        .math-enunciado .katex { font-size: clamp(1rem, 2.6vw, 1.45rem) !important; color: #fde047 !important; }
-        .math-current .katex { font-size: clamp(1.12rem, 3.6vw, 1.85rem) !important; color: #0f172a !important; line-height: 1.35 !important; }
-        .math-final .katex { font-size: clamp(1.2rem, 3.8vw, 2rem) !important; color: #0f172a !important; line-height: 1.35 !important; }
-
-        /* Etiquetas grandes de alto contraste para el gráfico SVG */
-        .chart-label-title {
-            font-family: 'Nunito', sans-serif;
-            font-weight: 900;
-            font-size: 15.5px;
-            fill: #0f172a;
-            stroke: #ffffff;
-            stroke-width: 4.5px;
-            paint-order: stroke fill;
-            text-anchor: middle;
-            dominant-baseline: middle;
-            pointer-events: none;
-        }
-        .chart-label-value {
-            font-family: 'Nunito', sans-serif;
-            font-weight: 900;
-            font-size: 17px;
-            fill: #0f172a;
-            stroke: #ffffff;
-            stroke-width: 5px;
-            paint-order: stroke fill;
-            text-anchor: middle;
-            dominant-baseline: middle;
-            pointer-events: none;
-        }
-        .sector-group {
-            cursor: pointer;
-            transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.2s ease;
-        }
-        .sector-group:hover {
-            filter: brightness(1.07);
-        }
-        .sector-path {
-            stroke: #ffffff;
-            stroke-width: 3;
-            stroke-linejoin: round;
-        }
+        .animate-robotTalkArmL { animation: robotTalkArmL 0.5s ease-in-out infinite; }
+        .animate-robotTalkArmR { animation: robotTalkArmR 0.5s ease-in-out infinite 0.1s; }
     </style>
 </head>
-<body>
-    <div id="root"></div>
+<body class="bg-gradient-to-br from-violet-600 via-fuchsia-600 to-orange-500 animate-gradient-x text-slate-800 font-fun h-screen w-screen overflow-hidden">
 
-    <script type="text/babel">
-        const { useState, useEffect, useRef, memo } = React;
+    <div id="app" class="h-full w-full flex flex-col p-2 sm:p-4 relative overflow-hidden">
+        <!-- Fondo Flotante Dinámico -->
+        <div id="floating-bg" class="absolute inset-0 overflow-hidden pointer-events-none z-0"></div>
 
-        const Icon = ({ paths, className = "", size = 24, fill = "none", strokeWidth = "2.5" }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill={fill} stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" className={className} dangerouslySetInnerHTML={{__html: paths}} />
-        );
+        <!-- Contenedor de Confeti -->
+        <div id="confetti-container" class="absolute inset-0 pointer-events-none z-[120] flex items-center justify-center overflow-hidden"></div>
 
-        const VolumeX = (p) => <Icon {...p} paths='<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>' />;
-        const Volume2 = (p) => <Icon {...p} paths='<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>' />;
-        const Rocket = (p) => <Icon {...p} paths='<path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/>' />;
-        const Sparkles = (p) => <Icon {...p} paths='<path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M3 5h4"/><path d="M19 3v4"/><path d="M17 5h4"/>' />;
-        const Home = (p) => <Icon {...p} paths='<path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>' />;
-        const ChevronLeft = (p) => <Icon {...p} paths='<polyline points="15 18 9 12 15 6"/>' />;
-        const ChevronRight = (p) => <Icon {...p} paths='<polyline points="9 18 15 12 9 6"/>' />;
+        <!-- HEADER GLOBAL VIBRANTE -->
+        <header class="shrink-0 relative z-20 w-full max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-3 bg-white/20 backdrop-blur-md px-4 py-2.5 sm:px-6 sm:py-3 rounded-[2rem] border-2 border-white/40 shadow-xl mb-3">
+            <div class="flex items-center gap-3 w-full md:w-auto">
+                <div class="bg-gradient-to-br from-yellow-300 to-amber-500 p-2.5 rounded-2xl shadow-lg border-2 border-yellow-100 transform rotate-3 hover:rotate-0 transition-transform hidden sm:block cursor-pointer" onclick="AudioController.play('pop')">
+                    <i data-lucide="target" class="text-white w-6 h-6"></i>
+                </div>
+                <div class="flex-1 text-center md:text-left">
+                    <h1 class="text-xl sm:text-2xl font-black text-white drop-shadow-md flex items-center justify-center md:justify-start gap-2">
+                        Nociones de <span class="bg-indigo-600/90 backdrop-blur-sm text-yellow-300 px-3 py-0.5 rounded-xl text-sm sm:text-base border-2 border-indigo-300 shadow-sm">Estadística</span>
+                    </h1>
+                    <p class="text-[10px] sm:text-xs text-yellow-100 font-extrabold uppercase tracking-widest mt-0.5 drop-shadow">TuProfe20 MathLab</p>
+                </div>
+            </div>
+            
+            <div class="flex gap-3 items-center justify-center w-full md:w-auto">
+                <div id="player-badge" class="hidden flex flex-col items-center bg-white/25 px-4 py-1 rounded-xl border-2 border-white/40 text-white shadow-sm">
+                    <span class="text-[9px] font-black uppercase tracking-wider text-yellow-200">Estudiante</span>
+                    <span id="player-name-display" class="text-xs sm:text-sm font-black truncate max-w-[130px] drop-shadow"></span>
+                </div>
+                <div class="flex items-center gap-2 bg-emerald-500/90 backdrop-blur-md px-4 py-1.5 rounded-xl border-2 border-emerald-200 text-white font-black shadow-lg">
+                    <i data-lucide="award" class="w-4 h-4 sm:w-5 sm:h-5 text-yellow-300 fill-yellow-300"></i> <span id="score-display">0/8</span>
+                </div>
+                <button onclick="toggleMute()" onmouseenter="AudioController.play('hover')" class="p-2 sm:p-2.5 rounded-xl bg-white/25 border-2 border-white/40 text-white hover:bg-white/40 transition-all hover:scale-110 active:scale-95 shadow-md">
+                    <i id="mute-icon" data-lucide="volume-2" class="w-5 h-5"></i>
+                </button>
+            </div>
+        </header>
 
-        // Controlador de Sonido y Voz
+        <!-- MAIN CONTAINER -->
+        <main class="w-full max-w-7xl mx-auto flex-1 flex flex-col relative z-10 bg-white/15 backdrop-blur-xl rounded-[2.5rem] border-2 border-white/40 shadow-[0_20px_50px_rgba(0,0,0,0.3)] overflow-hidden">
+            
+            <!-- TOP NAV -->
+            <div id="top-nav" class="hidden w-full bg-white/25 backdrop-blur-md border-b-2 border-white/30 px-4 py-2.5 flex items-center justify-between shrink-0">
+                <button onclick="navBack()" onmouseenter="AudioController.play('hover')" class="flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 border-b-[4px] border-indigo-800 text-white font-black text-xs sm:text-sm uppercase tracking-wider hover:bg-indigo-500 hover:-translate-y-0.5 active:translate-y-1 active:border-b-0 transition-all shadow-md">
+                    <i id="nav-icon" data-lucide="home" class="w-4 h-4"></i> <span id="nav-text">Salir</span>
+                </button>
+                <div id="reward-badge" class="hidden px-4 py-1.5 rounded-xl border-2 bg-white/90 border-indigo-200 text-indigo-900 shadow-md flex items-center gap-2">
+                    <span class="text-xs font-extrabold uppercase tracking-wider text-indigo-500 hidden sm:inline">Puntaje en juego:</span>
+                    <span class="text-sm sm:text-base font-black flex items-center gap-1 text-amber-600">
+                        <i data-lucide="star" class="w-4 h-4 text-amber-500 fill-amber-500 animate-spin" style="animation-duration: 6s;"></i> 
+                        <span id="live-score-badge">100</span> XP
+                    </span>
+                </div>
+            </div>
+
+            <div class="flex-1 flex flex-col overflow-hidden relative">
+                
+                <!-- VIEW 1: HOME (PORTADA LÚDICA) -->
+                <div id="view-home" class="flex-1 flex flex-col items-center justify-center p-4 sm:p-6 text-center relative overflow-y-auto custom-scrollbar">
+                    <div onclick="AudioController.play('levelUp')" class="cursor-pointer bg-gradient-to-tr from-amber-400 to-yellow-300 p-5 sm:p-7 rounded-full mb-4 sm:mb-6 border-4 border-white shadow-[0_10px_25px_rgba(245,158,11,0.5)] animate-robotFloat hover:scale-110 transition-transform">
+                        <i data-lucide="bar-chart-2" class="w-14 h-14 sm:w-20 sm:h-20 text-indigo-950 drop-shadow"></i>
+                    </div>
+                    <h2 class="text-4xl sm:text-6xl md:text-7xl font-black mb-4 sm:mb-6 text-transparent bg-clip-text bg-gradient-to-b from-white via-white to-yellow-200 drop-shadow-[0_4px_10px_rgba(0,0,0,0.25)] tracking-tight leading-none uppercase">
+                        Laboratorio <br/><span class="text-yellow-300">Estadístico</span>
+                    </h2>
+                    <div class="bg-white/20 backdrop-blur-xl p-6 sm:p-8 rounded-[2.5rem] border-2 border-white/50 shadow-[0_15px_35px_rgba(0,0,0,0.2)] w-full max-w-xl relative z-10">
+                        <h3 class="text-base sm:text-xl font-black text-white mb-4 sm:mb-5 uppercase tracking-wider flex items-center justify-center gap-2 drop-shadow">
+                            <i data-lucide="sparkles" class="text-yellow-300 w-6 h-6 animate-pulse"></i> Registro de Estudiante
+                        </h3>
+                        <input id="input-player-name" type="text" placeholder="¿Cómo te llamas?" oninput="AudioController.play('type')" onkeydown="if(event.key==='Enter') handleStart()"
+                            class="w-full text-center text-xl sm:text-2xl md:text-3xl font-black bg-white/95 border-b-[6px] border-indigo-200 rounded-2xl py-3 sm:py-4 px-6 text-indigo-900 placeholder-indigo-300 focus:outline-none focus:bg-white focus:border-amber-400 transition-all mb-5 sm:mb-6 shadow-inner uppercase" maxlength="18">
+                        <button id="btn-start" onclick="handleStart()" onmouseenter="AudioController.play('hover')" class="group px-6 sm:px-8 py-3.5 sm:py-4 font-black text-lg sm:text-2xl rounded-2xl transition-all w-full flex justify-center items-center gap-3 uppercase tracking-wider bg-gradient-to-r from-amber-400 via-orange-500 to-rose-500 hover:brightness-110 border-b-[6px] border-orange-700 text-white shadow-xl active:border-b-0 active:translate-y-[6px]">
+                            ¡A PARTICIPAR! <i data-lucide="play" class="w-6 h-6 sm:w-7 sm:h-7 fill-current animate-pulse"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- VIEW 2: MAP (PANEL DE 8 PRÁCTICAS) -->
+                <div id="view-map" class="hidden flex-1 flex flex-col p-4 sm:p-6 md:p-8 overflow-y-auto relative custom-scrollbar">
+                    <div class="text-center mb-6">
+                        <h2 class="text-2xl sm:text-4xl font-black text-white drop-shadow-md uppercase tracking-wider">
+                            ✨ Actividades de la Clase 1 ✨
+                        </h2>
+                        <p class="text-yellow-100 font-bold text-xs sm:text-sm mt-1">Resuelve cada ejercicio sin errores para llevarte los 100 puntos (-5 XP por error)</p>
+                    </div>
+                    
+                    <div id="challenges-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8 w-full max-w-6xl mx-auto px-2">
+                        <!-- Tarjetas de desafío inyectadas por JS -->
+                    </div>
+
+                    <div class="flex justify-center pb-6 mt-auto">
+                        <button id="btn-report" onclick="showResult()" onmouseenter="AudioController.play('hover')" class="hidden metallic-gold px-8 py-4 rounded-2xl font-black text-lg sm:text-xl transition-all duration-300 flex items-center gap-3 hover:brightness-110 border-b-[6px] border-yellow-700 shadow-2xl active:border-b-0 active:translate-y-[6px] uppercase tracking-wider animate-bounce">
+                            <i data-lucide="award" class="w-7 h-7"></i> Ver Reporte Final <i data-lucide="sparkles" class="w-6 h-6"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- VIEW 3: CHALLENGE WORKSPACE -->
+                <div id="view-challenge" class="hidden flex-1 flex flex-col p-3 sm:p-4 relative overflow-y-auto w-full pb-6 bg-gradient-to-br from-indigo-600/30 to-fuchsia-600/30 custom-scrollbar">
+                    <!-- Cabecera del ejercicio -->
+                    <div class="flex flex-col sm:flex-row items-center justify-between mb-3 bg-white/20 backdrop-blur-md border-2 border-white/40 shadow-lg p-3 sm:px-5 rounded-2xl gap-3 w-full max-w-7xl mx-auto">
+                        <div class="flex items-center gap-3">
+                            <div class="w-11 h-11 rounded-xl overflow-hidden border-2 border-white shadow-md shrink-0 hidden sm:block">
+                                <img id="challenge-img" src="" alt="cover" class="w-full h-full object-cover" />
+                            </div>
+                            <div class="text-center sm:text-left">
+                                <h4 id="challenge-enunciado" class="text-yellow-300 font-black uppercase text-[10px] sm:text-xs tracking-widest drop-shadow"></h4>
+                                <h2 id="challenge-title" class="text-base sm:text-xl font-black text-white uppercase tracking-wide drop-shadow-md"></h2>
+                            </div>
+                        </div>
+                        <div class="bg-indigo-900/60 border border-indigo-300/50 px-3 py-1.5 rounded-xl text-white text-xs font-bold flex items-center gap-2">
+                            <i data-lucide="zap" class="w-4 h-4 text-yellow-300 fill-yellow-300"></i>
+                            <span>Meta: <strong>100 XP</strong> (-5 XP por fallo)</span>
+                        </div>
+                    </div>
+
+                    <div id="challenge-workspace" class="flex-1 flex flex-col items-center w-full relative max-w-7xl mx-auto transition-all duration-500 opacity-100">
+                        <div class="flex flex-col xl:flex-row w-full gap-4 items-stretch flex-1">
+                            
+                            <!-- PANEL IZQUIERDO: Escáner / Quiz -->
+                            <div class="w-full xl:w-[44%] flex flex-col min-h-[36vh] xl:min-h-0">
+                                <!-- Matriz de Datos -->
+                                <div id="panel-matrix" class="bg-white/95 backdrop-blur-3xl p-4 sm:p-5 rounded-[2rem] border-4 border-white shadow-2xl flex flex-col h-full w-full relative overflow-hidden flex-1">
+                                    <div class="flex justify-between items-center mb-3 sm:mb-4">
+                                        <h4 class="text-indigo-600 font-black uppercase tracking-wider flex items-center gap-2 text-xs sm:text-base bg-indigo-50 px-3.5 py-1.5 rounded-xl border-2 border-indigo-100">
+                                            <i data-lucide="grip" class="w-5 h-5 text-indigo-500"></i> Escáner de Datos
+                                        </h4>
+                                        <span id="matrix-n" class="bg-gradient-to-r from-amber-400 to-orange-500 text-white px-4 py-1.5 rounded-xl font-black shadow-md text-base sm:text-xl transform rotate-2"></span>
+                                    </div>
+                                    <div id="matrix-grid" class="grid gap-1.5 sm:gap-2 mb-1 flex-1 content-start z-10 h-full overflow-y-auto pr-1 custom-scrollbar">
+                                        <!-- Botones de datos inyectados -->
+                                    </div>
+                                </div>
+
+                                <!-- Cuestionario Final -->
+                                <div id="panel-quiz" class="hidden bg-white/95 backdrop-blur-3xl p-5 sm:p-6 rounded-[2rem] border-4 border-white shadow-2xl flex flex-col h-full w-full relative overflow-y-auto custom-scrollbar flex-1 animate-slideInRight">
+                                    <h3 class="text-lg sm:text-2xl font-black text-indigo-600 mb-4 flex items-center gap-2.5 uppercase tracking-wider border-b-4 border-indigo-50 pb-3">
+                                        <i data-lucide="book-open" class="w-7 h-7 text-amber-500"></i> Preguntas de la Actividad
+                                    </h3>
+                                    <div id="quiz-list" class="flex flex-col gap-4 flex-1">
+                                        <!-- Preguntas inyectadas -->
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- PANEL DERECHO: Tabla de Frecuencias Completa -->
+                            <div class="w-full xl:w-[56%] flex flex-col">
+                                <div class="relative w-full h-full p-4 sm:p-5 bg-white/95 backdrop-blur-3xl border-4 border-white rounded-[2rem] shadow-2xl flex flex-col items-center">
+                                    <h3 class="text-base sm:text-xl font-black text-white uppercase tracking-widest mb-3 flex items-center justify-center gap-2.5 bg-gradient-to-r from-violet-600 via-indigo-600 to-blue-600 px-6 py-3 rounded-2xl w-full text-center shadow-md">
+                                        <i data-lucide="bar-chart-2" class="text-yellow-300 w-6 h-6"></i> Tabla de Frecuencias
+                                    </h3>
+                                    <div class="w-full overflow-x-auto rounded-2xl border-2 border-slate-100 bg-white flex-1 flex flex-col shadow-inner custom-scrollbar relative">
+                                        <table class="w-full text-center border-collapse h-full min-w-[480px]">
+                                            <thead id="table-head"></thead>
+                                            <tbody id="table-body"></tbody>
+                                            <tfoot id="table-foot"></tfoot>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- Overlay de Nivel Completado (Cartel Metálico) -->
+                    <div id="overlay-complete" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-black/70 backdrop-blur-md animate-fadeIn">
+                        <div id="complete-glow" class="absolute inset-0 pointer-events-none z-0 flex items-center justify-center">
+                            <div class="w-full h-full bg-yellow-400/25 animate-ping rounded-full blur-3xl max-w-xl max-h-xl"></div>
+                        </div>
+                        
+                        <div id="complete-modal" class="w-full max-w-2xl p-6 sm:p-10 rounded-[3rem] flex flex-col items-center justify-center text-center animate-jellyPop overflow-y-auto shadow-2xl relative metallic-gold z-10">
+                            <div class="absolute inset-0 rounded-[3rem] bg-gradient-to-tr from-white/0 via-white/40 to-white/0 opacity-70 pointer-events-none"></div>
+                            
+                            <div id="complete-badge" class="relative z-10 text-yellow-900 bg-white/50 border-yellow-200 px-6 py-2 rounded-full mb-4 border-2 shadow-sm backdrop-blur-sm">
+                                <h4 id="complete-title" class="font-black uppercase tracking-widest flex items-center justify-center gap-2 text-base sm:text-xl metallic-text-gold">
+                                    <i data-lucide="award" class="w-6 h-6"></i> ¡EJERCICIO SUPERADO!
+                                </h4>
+                            </div>
+
+                            <h2 id="complete-student-heading" class="relative z-10 text-3xl sm:text-5xl font-black mb-2 leading-tight uppercase metallic-text-gold text-yellow-950">
+                                ¡Felicitaciones, <span id="complete-name"></span>!
+                            </h2>
+
+                            <p id="complete-desc" class="relative z-10 text-sm sm:text-lg font-extrabold mb-6 uppercase tracking-wider text-yellow-900/90">
+                                ¡Completaste toda la tabla y las preguntas!
+                            </p>
+                            
+                            <div id="complete-score-box" class="relative z-10 px-8 py-4 rounded-[2rem] border-b-[6px] mb-8 shadow-2xl transform rotate-1 bg-white/70 border-white text-yellow-900">
+                                <span class="text-xs sm:text-sm font-black uppercase tracking-widest block mb-1 opacity-80">Has conseguido</span>
+                                <span id="complete-score" class="text-4xl sm:text-6xl font-black flex items-center justify-center gap-2">100 PUNTOS</span>
+                            </div>
+                            
+                            <button onclick="navBack()" onmouseenter="AudioController.play('hover')" id="complete-btn" class="relative z-10 px-8 py-4 font-black text-lg sm:text-xl rounded-2xl transition-all flex items-center gap-3 border-b-[6px] shadow-2xl active:border-b-0 active:translate-y-[6px] uppercase tracking-wider hover:brightness-110 bg-slate-900 border-black text-yellow-400">
+                                Elegir Otro Ejercicio <i data-lucide="arrow-right" class="w-6 h-6"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VIEW 4: RESULTADO GLOBAL -->
+                <div id="view-result" class="hidden flex-1 flex flex-col items-center justify-center p-4 sm:p-6 text-center relative overflow-y-auto h-full">
+                    <div id="result-modal" class="relative w-full max-w-2xl p-8 sm:p-12 rounded-[3rem] flex flex-col items-center justify-center shadow-2xl animate-jellyPop metallic-gold">
+                        <div class="absolute inset-0 rounded-[3rem] bg-gradient-to-tr from-white/0 via-white/50 to-white/0 opacity-60 pointer-events-none"></div>
+                        <i id="result-icon" data-lucide="award" class="relative z-10 w-20 h-20 sm:w-24 sm:h-24 text-yellow-900 mb-3 drop-shadow-lg"></i>
+                        <div class="relative z-10 bg-white/50 backdrop-blur-md border-2 border-white px-5 py-1.5 rounded-full mb-3 shadow-sm font-black text-xs sm:text-sm uppercase tracking-widest text-yellow-950">
+                            REPORTE FINAL DE LOGROS
+                        </div>
+                        <h1 id="result-name" class="relative z-10 text-3xl sm:text-5xl md:text-6xl font-black mb-6 uppercase tracking-wider break-words w-full metallic-text-gold text-yellow-950"></h1>
+                        
+                        <div class="relative z-10 bg-black/10 backdrop-blur-md border-2 border-yellow-700/30 shadow-inner p-6 sm:p-8 rounded-[2rem] mb-8 w-full transform -rotate-1">
+                            <h3 class="font-black uppercase tracking-widest mb-2 text-xs sm:text-sm text-yellow-950 border-b border-yellow-900/20 pb-2">PUNTAJE TOTAL ACUMULADO</h3>
+                            <div class="flex flex-col sm:flex-row justify-center items-center sm:items-baseline gap-2 mt-3">
+                                <p id="result-score" class="text-5xl sm:text-7xl font-black drop-shadow-md text-yellow-950">0</p>
+                                <span class="text-xl sm:text-2xl font-black text-yellow-900/70">/ 800 PUNTOS</span>
+                            </div>
+                        </div>
+                        <div class="relative z-10 flex flex-col sm:flex-row items-center justify-center gap-4 w-full">
+                            <button onclick="downloadReport()" onmouseenter="AudioController.play('hover')" id="btn-download" class="flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3.5 border-b-[6px] font-black text-sm sm:text-base rounded-2xl transition-all shadow-xl active:border-b-0 active:translate-y-[6px] uppercase tracking-wider hover:brightness-110 bg-slate-900 border-black text-yellow-400">
+                                <i data-lucide="download" class="w-5 h-5"></i> Descargar Reporte
+                            </button>
+                            <button onclick="resetGame()" onmouseenter="AudioController.play('hover')" class="flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3.5 bg-white/60 border-b-[6px] border-white font-black text-sm sm:text-base rounded-2xl transition-all shadow-lg active:border-b-0 active:translate-y-[6px] hover:bg-white/80 text-yellow-950 uppercase tracking-wider">
+                                <i data-lucide="user-plus" class="w-5 h-5"></i> Nuevo Estudiante
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- FOOTER ROBOT ANIMADO Y COLORIDO -->
+            <footer class="shrink-0 bg-white/95 backdrop-blur-3xl w-full px-4 py-2.5 sm:px-8 sm:py-3.5 flex items-center gap-4 sm:gap-7 border-t-[4px] border-white z-20 shadow-[0_-10px_30px_rgba(0,0,0,0.15)]">
+                <div id="robot-container" onclick="pokeRobot()" class="shrink-0 absolute -top-16 sm:relative sm:-top-0 left-3 sm:left-0 drop-shadow-xl scale-90 sm:scale-100 relative flex flex-col items-center cursor-pointer hover:scale-110 transition-transform animate-robotFloat">
+                    <!-- Antena luminosa -->
+                    <div class="relative z-0 flex flex-col items-center translate-y-1">
+                        <div id="robot-antenna" class="w-4 h-4 rounded-full shadow-[0_0_14px_currentColor] z-10 transition-colors duration-300 text-yellow-400 bg-yellow-400 animate-pulse border-2 border-white"></div>
+                        <div class="w-1.5 h-4 bg-indigo-400 rounded-full"></div>
+                    </div>
+                    <!-- Cuerpo / Cabeza alegre -->
+                    <div class="relative z-10 w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-white via-indigo-50 to-indigo-200 rounded-[1.8rem] border-[4px] border-indigo-400 shadow-xl flex flex-col items-center justify-center p-2 transition-transform duration-300">
+                        <div class="w-full h-full bg-slate-900 rounded-2xl flex flex-col items-center justify-center p-1.5 shadow-inner border-2 border-indigo-500/40 relative overflow-hidden">
+                            <!-- Ojos expresivos -->
+                            <div id="robot-eyes" class="w-full flex justify-between px-2">
+                                <div class="w-4 h-4 bg-yellow-400 rounded-full animate-bounce shadow-[0_0_8px_#facc15]"></div>
+                                <div class="w-4 h-4 bg-yellow-400 rounded-full animate-bounce shadow-[0_0_8px_#facc15]"></div>
+                            </div>
+                            <!-- Boca expresiva -->
+                            <div id="robot-mouth-wrap" class="mt-1.5 flex items-center justify-center">
+                                <div class="w-5 h-3.5 bg-rose-400 rounded-b-full animate-pulse shadow-[0_0_6px_#fb7185]"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Brazos animados -->
+                    <div id="robot-arm-l" class="absolute top-1/2 -left-3 w-4 h-7 bg-amber-400 border-[3px] border-indigo-500 rounded-full z-0 origin-top transition-transform duration-300 animate-robotTalkArmL"></div>
+                    <div id="robot-arm-r" class="absolute top-1/2 -right-3 w-4 h-7 bg-amber-400 border-[3px] border-indigo-500 rounded-full z-0 origin-top transition-transform duration-300 animate-robotTalkArmR"></div>
+                </div>
+                
+                <div class="flex-1 text-sm sm:text-lg font-extrabold text-indigo-950 leading-snug ml-16 sm:ml-0 bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 p-3 sm:p-4 rounded-2xl border-2 border-indigo-200 min-h-[3.8rem] sm:min-h-[4.5rem] flex items-center shadow-inner relative">
+                    <div id="bot-msg-wrapper" class="animate-slideInRight w-full">
+                        <p id="bot-msg" class="text-indigo-900 drop-shadow-sm">
+                            ¡Hola! Soy el asistente de TuProfe20 MathLab. Escribe tu nombre arriba para salir a la pizarra y ganar tus 100 puntos.
+                        </p>
+                    </div>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <script>
+        // ==========================================
+        // MOTOR DE AUDIO INTERACTIVO ENRIQUECIDO
+        // ==========================================
         const AudioController = {
             ctx: null, muted: false,
             init: function() {
-                if (!this.ctx) {
-                    const AudioContext = window.AudioContext || window.webkitAudioContext;
-                    if (AudioContext) this.ctx = new AudioContext();
-                }
-                if (this.ctx && this.ctx.state === 'suspended') {
-                    this.ctx.resume();
-                }
+                if (this.ctx) return;
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (AudioContext) this.ctx = new AudioContext();
             },
             play: function(type) {
                 this.init();
                 if (this.muted || !this.ctx) return;
+                if (this.ctx.state === 'suspended') this.ctx.resume();
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
                 const now = this.ctx.currentTime;
-                
-                if (type === 'pop') {
-                    const osc = this.ctx.createOscillator(); const gain = this.ctx.createGain();
-                    osc.connect(gain); gain.connect(this.ctx.destination);
-                    osc.type = 'sine'; osc.frequency.setValueAtTime(520, now); osc.frequency.exponentialRampToValueAtTime(880, now + 0.09);
-                    gain.gain.setValueAtTime(0.25, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.09);
-                    osc.start(now); osc.stop(now + 0.09);
-                } else if (type === 'pop-reverse') {
-                    const osc = this.ctx.createOscillator(); const gain = this.ctx.createGain();
-                    osc.connect(gain); gain.connect(this.ctx.destination);
-                    osc.type = 'triangle'; osc.frequency.setValueAtTime(650, now); osc.frequency.exponentialRampToValueAtTime(300, now + 0.11);
-                    gain.gain.setValueAtTime(0.2, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.11);
-                    osc.start(now); osc.stop(now + 0.11);
-                } else if (type === 'slice') {
-                    const osc = this.ctx.createOscillator(); const gain = this.ctx.createGain();
-                    osc.connect(gain); gain.connect(this.ctx.destination);
-                    osc.type = 'sine'; osc.frequency.setValueAtTime(620, now); osc.frequency.exponentialRampToValueAtTime(1150, now + 0.07);
-                    gain.gain.setValueAtTime(0.2, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.07);
-                    osc.start(now); osc.stop(now + 0.07);
-                } else if (type === 'success') {
-                    const notes = [523.25, 659.25, 783.99, 1046.50];
-                    notes.forEach((freq, i) => {
-                        const o = this.ctx.createOscillator(); const g = this.ctx.createGain();
-                        o.type = 'triangle'; o.frequency.value = freq;
-                        o.connect(g); g.connect(this.ctx.destination);
-                        const startTime = now + (i * 0.07);
-                        g.gain.setValueAtTime(0, startTime); g.gain.linearRampToValueAtTime(0.22, startTime + 0.03); g.gain.linearRampToValueAtTime(0, startTime + 0.35);
-                        o.start(startTime); o.stop(startTime + 0.35);
-                    });
+
+                if (type === 'hover') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(320, now);
+                    osc.frequency.exponentialRampToValueAtTime(420, now + 0.04);
+                    gain.gain.setValueAtTime(0.05, now);
+                    gain.gain.exponentialRampToValueAtTime(0.005, now + 0.04);
+                    osc.start(now); osc.stop(now + 0.04);
+                } else if (type === 'type') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(500 + Math.random() * 150, now);
+                    gain.gain.setValueAtTime(0.08, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.03);
+                    osc.start(now); osc.stop(now + 0.03);
+                } else if (type === 'pop' || type === 'correct') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(480, now);
+                    osc.frequency.exponentialRampToValueAtTime(880, now + 0.12);
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+                    osc.start(now); osc.stop(now + 0.12);
                 } else if (type === 'swoosh') {
-                    const osc = this.ctx.createOscillator(); const gain = this.ctx.createGain();
-                    osc.connect(gain); gain.connect(this.ctx.destination);
-                    osc.type = 'sine'; osc.frequency.setValueAtTime(320, now); osc.frequency.exponentialRampToValueAtTime(90, now + 0.16);
-                    gain.gain.setValueAtTime(0.2, now); gain.gain.linearRampToValueAtTime(0.01, now + 0.16);
-                    osc.start(now); osc.stop(now + 0.16);
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(280, now);
+                    osc.frequency.exponentialRampToValueAtTime(60, now + 0.18);
+                    gain.gain.setValueAtTime(0.25, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.18);
+                    osc.start(now); osc.stop(now + 0.18);
+                } else if (type === 'wrong') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(520, now);
+                    osc.frequency.exponentialRampToValueAtTime(200, now + 0.18);
+                    gain.gain.setValueAtTime(0.25, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.18);
+                    osc.start(now); osc.stop(now + 0.18);
+                } else if (type === 'levelUp') {
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(440, now);
+                    osc.frequency.setValueAtTime(587.33, now + 0.1);
+                    osc.frequency.setValueAtTime(880, now + 0.2);
+                    osc.frequency.setValueAtTime(1174.66, now + 0.3);
+                    gain.gain.setValueAtTime(0.12, now);
+                    gain.gain.linearRampToValueAtTime(0, now + 0.55);
+                    osc.start(now); osc.stop(now + 0.55);
+                } else if (type === 'win') {
+                    osc.disconnect();
+                    const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51];
+                    notes.forEach((freq, i) => {
+                        const o = this.ctx.createOscillator();
+                        const g = this.ctx.createGain();
+                        o.type = 'triangle';
+                        o.frequency.value = freq;
+                        o.connect(g); g.connect(this.ctx.destination);
+                        const startTime = now + (i * 0.08);
+                        g.gain.setValueAtTime(0, startTime);
+                        g.gain.linearRampToValueAtTime(0.22, startTime + 0.04);
+                        g.gain.linearRampToValueAtTime(0, startTime + 0.45);
+                        o.start(startTime); o.stop(startTime + 0.45);
+                    });
                 }
             },
-            speak: function(text) {
-                if (this.muted || !('speechSynthesis' in window)) return;
-                window.speechSynthesis.cancel();
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'es-PE';
-                utterance.rate = 1.05;
-                utterance.pitch = 1.08;
-                window.speechSynthesis.speak(utterance);
-            },
-            toggleMute: function() {
-                this.muted = !this.muted;
-                if (this.muted && 'speechSynthesis' in window) window.speechSynthesis.cancel();
-                return this.muted;
-            }
+            toggleMute: function() { this.muted = !this.muted; return this.muted; }
         };
 
-        const STATISTICAL_EXERCISES = [
+        // ==========================================
+        // LOS 8 EJERCICIOS EXACTOS DEL LIBRO
+        // ==========================================
+        const CHALLENGES = [
             {
-                id: 1,
-                title: "Reto 1",
-                subtitle: "Deportes Favoritos",
-                cardBg: "from-[#ff9f1c] to-[#f77f00] border-[#ffbf69]",
-                enunciadoText: "De un grupo de 900 jóvenes, se registró su deporte favorito. ¿Cuántos jóvenes más prefieren Básquet que Fútbol?",
-                enunciadoLatex: String.raw`\text{Total} = 900`,
-                baseSectors: [
-                    { label: 'Natación', value: 120, color: '#06b6d4' },
-                    { label: 'Básquet', value: 165, color: '#f59e0b' },
-                    { label: 'Fútbol', value: 75, color: '#10b981' }
-                ],
-                steps: [
-                    {
-                        propertyText: "Paso 1: Suma de ángulos = 360°",
-                        sectorTexts: ['120°', '11r', '5r'],
-                        latex: String.raw`\begin{aligned} 120^{\circ} + 11r + 5r &= 360^{\circ} \\ 120^{\circ} + 16r &= 360^{\circ} \end{aligned}`,
-                        robotSpeech: "¡Empecemos! Toda la vuelta del círculo mide 360 grados. Sumamos los tres sectores para hallar el valor de r."
-                    },
-                    {
-                        propertyText: "Paso 2: Resolviendo el valor de r",
-                        sectorTexts: ['120°', '11(15°)', '5(15°)'],
-                        latex: String.raw`\begin{aligned} 16r &= 360^{\circ} - 120^{\circ} \\ 16r &= 240^{\circ} \implies \textcolor{#e11d48}{\mathbf{r = 15^{\circ}}} \end{aligned}`,
-                        robotSpeech: "El 120° pasa a restar quedando 240°. Luego dividimos 240° entre 16 y descubrimos que r vale 15°."
-                    },
-                    {
-                        propertyText: "Paso 3: Ángulos y Diferencia (Básquet - Fútbol)",
-                        sectorTexts: ['120°', '165°', '75°'],
-                        latex: String.raw`\begin{aligned} \text{Básquet} &= 11(15^{\circ}) = 165^{\circ} \quad;\quad \text{Fútbol} = 5(15^{\circ}) = 75^{\circ} \\ \text{Diferencia} &= 165^{\circ} - 75^{\circ} = \textcolor{#7c3aed}{\mathbf{90^{\circ}}} \end{aligned}`,
-                        robotSpeech: "Reemplazamos r = 15°: Básquet tiene 165° y Fútbol 75°. La diferencia entre ambos es de 90°."
-                    },
-                    {
-                        propertyText: "Paso 4: Regla de Tres Simple en Aspa",
-                        sectorTexts: ['120°', '165°', '75°'],
-                        latex: String.raw`\begin{matrix} \textcolor{#1e40af}{\mathbf{360^{\circ}}} & \longleftrightarrow & \textcolor{#047857}{\mathbf{900\text{ jóv.}}} \\ \text{ } & \textcolor{#e11d48}{\huge\times} & \text{ } \\ \textcolor{#be185d}{\mathbf{90^{\circ}}} & \longleftrightarrow & \textcolor{#7c3aed}{\mathbf{x}} \end{matrix}`,
-                        robotSpeech: "Planteamos la Regla de Tres: si 360° corresponden a 900 jóvenes, ¿cuántos jóvenes (x) serán los 90° de diferencia?"
-                    },
-                    {
-                        propertyText: "Paso 5: Simplificación y Resultado",
-                        sectorTexts: ['300 jóv.', 'Dif: 225', '187,5 jóv.'],
-                        latex: String.raw`\begin{aligned} x &= \frac{\cancel{90}^{\textcolor{#e11d48}{1}} \cdot 900}{\cancel{360}_{\textcolor{#e11d48}{4}}} = \frac{900}{4} = \mathbf{225\text{ jóvenes}} \end{aligned}`,
-                        robotSpeech: "Simplificamos sacando noventava arriba (1) y abajo (4). Finalmente dividimos 900 entre 4 y obtenemos 225 jóvenes."
-                    }
-                ]
+                id: 'ej_1', title: 'Edades de 30 estudiantes', enunciado: 'Actividad 01', text: 'Edades de 30 estudiantes en un concurso de matemática.', points: 100, imageUrl: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=600&q=80',
+                resolution: {
+                    n: 30, cols: 6, columnsToTest: ['fi', 'hi', 'p'],
+                    rawData: [11, 10, 9, 13, 13, 10, 13, 9, 12, 13, 13, 11, 12, 10, 13, 10, 12, 9, 10, 13, 13, 13, 12, 13, 13, 9, 10, 12, 11, 9],
+                    categories: [{ label: '9 años', raw: 9 }, { label: '10 años', raw: 10 }, { label: '11 años', raw: 11 }, { label: '12 años', raw: 12 }, { label: '13 años', raw: 13 }],
+                    correctTable: [{ fi: 5, hi: 0.167, p: 16.7 }, { fi: 6, hi: 0.200, p: 20 }, { fi: 3, hi: 0.100, p: 10 }, { fi: 5, hi: 0.167, p: 16.7 }, { fi: 11, hi: 0.367, p: 36.7 }],
+                    quiz: [{ q: 'a) ¿Cuántos estudiantes tienen 12 años?', a: 5 }, { q: 'b) ¿Qué porcentaje del total de estudiantes encuestados tiene 11 años?', a: 10 }]
+                }
             },
             {
-                id: 2,
-                title: "Reto 2",
-                subtitle: "Áreas Académicas",
-                cardBg: "from-[#4361ee] to-[#3a0ca3] border-[#4cc9f0]",
-                enunciadoText: "El gráfico muestra las áreas preferidas por 240 postulantes. Calcula la suma de los que prefieren Ing. Química con Letras.",
-                enunciadoLatex: String.raw`\text{Total} = 240`,
-                baseSectors: [
-                    { label: 'Medicina', value: 108, color: '#6366f1' },
-                    { label: 'Letras', value: 63, color: '#d946ef' },
-                    { label: 'Ing. Química', value: 99, color: '#14b8a6' },
-                    { label: 'Derecho', value: 90, color: '#facc15', isRightAngle: true }
-                ],
-                steps: [
-                    {
-                        propertyText: "Paso 1: Ángulo Recto = 90°",
-                        sectorTexts: ['108°', '63°', 'α', '90°'],
-                        latex: String.raw`\begin{aligned} \text{Derecho} &= \mathbf{90^{\circ}} \\ 108^{\circ} + 63^{\circ} + 90^{\circ} + \alpha &= 360^{\circ} \end{aligned}`,
-                        robotSpeech: "Observa el cuadradito en el sector Derecho: ¡indica un ángulo recto de 90°! Sumamos todos los ángulos e igualamos a 360°."
-                    },
-                    {
-                        propertyText: "Paso 2: Ángulo de Ing. Química + Letras",
-                        sectorTexts: ['108°', '63°', '99°', '90°'],
-                        latex: String.raw`\begin{aligned} 261^{\circ} + \alpha &= 360^{\circ} \implies \alpha = \mathbf{99^{\circ}} \\ \text{Quím. + Letras} &= 99^{\circ} + 63^{\circ} = \textcolor{#be185d}{\mathbf{162^{\circ}}} \end{aligned}`,
-                        robotSpeech: "Hallamos que Ing. Química mide 99°. Al sumarlo con los 63° de Letras obtenemos 162° en conjunto."
-                    },
-                    {
-                        propertyText: "Paso 3: Regla de Tres Simple en Aspa",
-                        sectorTexts: ['108°', '63°', '99°', '90°'],
-                        latex: String.raw`\begin{matrix} \textcolor{#1e40af}{\mathbf{360^{\circ}}} & \longleftrightarrow & \textcolor{#047857}{\mathbf{240\text{ post.}}} \\ \text{ } & \textcolor{#e11d48}{\huge\times} & \text{ } \\ \textcolor{#be185d}{\mathbf{162^{\circ}}} & \longleftrightarrow & \textcolor{#7c3aed}{\mathbf{x}} \end{matrix}`,
-                        robotSpeech: "Planteamos la Regla de Tres: 360° representan a los 240 postulantes. ¿Cuántos postulantes (x) representan 162°?"
-                    },
-                    {
-                        propertyText: "Paso 4: Simplificación y Resultado",
-                        sectorTexts: ['72 post.', '42 post.', '66 post.', '60 post.'],
-                        latex: String.raw`\begin{aligned} x &= \frac{162 \cdot \cancel{240}^{\textcolor{#e11d48}{2}}}{\cancel{360}_{\textcolor{#e11d48}{3}}} = \frac{\cancel{162}^{\textcolor{#0284c7}{54}} \cdot 2}{\cancel{3}_{\textcolor{#0284c7}{1}}} = \mathbf{108\text{ postulantes}} \end{aligned}`,
-                        robotSpeech: "Simplificamos 240 y 360 sacando 120ava (2 y 3). Luego 162 entre 3 nos da 54, y por 2 resulta 108 postulantes."
-                    }
-                ]
+                id: 'ej_2', title: 'Notas de 25 estudiantes', enunciado: 'Actividad 02', text: 'Notas que obtuvieron 25 estudiantes en este curso.', points: 100, imageUrl: 'https://images.unsplash.com/photo-1588072432836-e10032774350?auto=format&fit=crop&w=600&q=80',
+                resolution: {
+                    n: 25, cols: 5, columnsToTest: ['fi', 'hi', 'p'],
+                    rawData: [15, 16, 14, 13, 15, 10, 18, 13, 10, 16, 12, 16, 12, 11, 13, 13, 12, 18, 13, 10, 15, 15, 16, 11, 12],
+                    categories: [{ label: 'Nota 10', raw: 10 }, { label: 'Nota 11', raw: 11 }, { label: 'Nota 12', raw: 12 }, { label: 'Nota 13', raw: 13 }, { label: 'Nota 14', raw: 14 }, { label: 'Nota 15', raw: 15 }, { label: 'Nota 16', raw: 16 }, { label: 'Nota 18', raw: 18 }],
+                    correctTable: [{ fi: 3, hi: 0.12, p: 12 }, { fi: 2, hi: 0.08, p: 8 }, { fi: 4, hi: 0.16, p: 16 }, { fi: 5, hi: 0.20, p: 20 }, { fi: 1, hi: 0.04, p: 4 }, { fi: 4, hi: 0.16, p: 16 }, { fi: 4, hi: 0.16, p: 16 }, { fi: 2, hi: 0.08, p: 8 }],
+                    quiz: [{ q: 'a) ¿Cuántos estudiantes obtuvieron la nota 14?', a: 1 }, { q: 'b) ¿Qué porcentaje de estudiantes obtuvieron la nota 16?', a: 16 }]
+                }
             },
             {
-                id: 3,
-                title: "Reto 3",
-                subtitle: "Cursos Escolares",
-                cardBg: "from-[#06d6a0] to-[#118ab2] border-[#80ffdb]",
-                enunciadoText: "Se representa la preferencia de 720 estudiantes por 5 cursos. ¿Cuántos más prefieren Matemática que Ciencia y Ambiente?",
-                enunciadoLatex: String.raw`\text{Total} = 720`,
-                baseSectors: [
-                    { label: 'Matemática', value: 108, color: '#8b5cf6' },
-                    { label: 'P. Social', value: 118, color: '#f59e0b' },
-                    { label: 'C. y Amb.', value: 36, color: '#10b981' },
-                    { label: 'Arte', value: 28, color: '#ec4899' },
-                    { label: 'Lenguaje', value: 70, color: '#3b82f6' }
-                ],
-                steps: [
-                    {
-                        propertyText: "Paso 1: Suma de sectores = 360°",
-                        sectorTexts: ['6θ', '118°', '2θ', '28°', '70°'],
-                        latex: String.raw`\begin{aligned} 6\theta + 2\theta + 118^{\circ} + 28^{\circ} + 70^{\circ} &= 360^{\circ} \\ 8\theta + 216^{\circ} &= 360^{\circ} \end{aligned}`,
-                        robotSpeech: "En el gráfico Matemática es 6θ y Ciencia y Ambiente es 2θ. Sumamos todos los ángulos e igualamos a 360°."
-                    },
-                    {
-                        propertyText: "Paso 2: Hallando θ y la diferencia",
-                        sectorTexts: ['108°', '118°', '36°', '28°', '70°'],
-                        latex: String.raw`\begin{aligned} 8\theta &= 144^{\circ} \implies \theta = \mathbf{18^{\circ}} \\ \text{Mat.} - \text{C.A.} &= 6\theta - 2\theta = 4(18^{\circ}) = \textcolor{#be185d}{\mathbf{72^{\circ}}} \end{aligned}`,
-                        robotSpeech: "Despejamos θ = 18°. Así Matemática mide 108° y C. y Ambiente 36°. Su diferencia es 4θ = 72°."
-                    },
-                    {
-                        propertyText: "Paso 3: Regla de Tres Simple en Aspa",
-                        sectorTexts: ['108°', '118°', '36°', '28°', '70°'],
-                        latex: String.raw`\begin{matrix} \textcolor{#1e40af}{\mathbf{360^{\circ}}} & \longleftrightarrow & \textcolor{#047857}{\mathbf{720\text{ est.}}} \\ \text{ } & \textcolor{#e11d48}{\huge\times} & \text{ } \\ \textcolor{#be185d}{\mathbf{72^{\circ}}} & \longleftrightarrow & \textcolor{#7c3aed}{\mathbf{x}} \end{matrix}`,
-                        robotSpeech: "Planteamos la Regla de Tres Simple: si 360° corresponden a 720 estudiantes, ¿a cuántos estudiantes (x) corresponden 72°?"
-                    },
-                    {
-                        propertyText: "Paso 4: Simplificación y Resultado",
-                        sectorTexts: ['216 est.', '236 est.', '72 est.', '56 est.', '140 est.'],
-                        latex: String.raw`\begin{aligned} x &= \frac{72 \cdot \cancel{720}^{\textcolor{#e11d48}{2}}}{\cancel{360}_{\textcolor{#e11d48}{1}}} = 72 \cdot 2 = \mathbf{144\text{ estudiantes}} \end{aligned}`,
-                        robotSpeech: "¡Simplificamos 720 entre 360 y nos queda 2! Multiplicamos 72 por 2 y obtenemos 144 estudiantes de diferencia."
-                    }
-                ]
+                id: 'ej_3', title: 'Edades de 40 estudiantes', enunciado: 'Actividad 03', text: 'Edades que tienen 40 estudiantes en un aula.', points: 100, imageUrl: 'https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?auto=format&fit=crop&w=600&q=80',
+                resolution: {
+                    n: 40, cols: 8, columnsToTest: ['fi', 'hi', 'p'],
+                    rawData: [10, 12, 13, 10, 9, 13, 12, 10, 12, 13, 10, 11, 10, 13, 10, 9, 10, 10, 9, 12, 11, 12, 11, 10, 13, 11, 11, 9, 10, 11, 10, 12, 11, 10, 12, 10, 12, 10, 11, 10],
+                    categories: [{ label: '9 años', raw: 9 }, { label: '10 años', raw: 10 }, { label: '11 años', raw: 11 }, { label: '12 años', raw: 12 }, { label: '13 años', raw: 13 }],
+                    correctTable: [{ fi: 4, hi: 0.100, p: 10 }, { fi: 15, hi: 0.375, p: 37.5 }, { fi: 8, hi: 0.200, p: 20 }, { fi: 8, hi: 0.200, p: 20 }, { fi: 5, hi: 0.125, p: 12.5 }],
+                    quiz: [{ q: 'a) ¿Qué porcentaje de estudiantes tiene 10 años?', a: 37.5 }, { q: 'b) ¿Qué porcentaje de estudiantes tiene más de 10 años?', a: 52.5 }]
+                }
             },
             {
-                id: 4,
-                title: "Reto 4",
-                subtitle: "Medios de Transporte",
-                cardBg: "from-[#f72585] to-[#b5179e] border-[#ff70a6]",
-                enunciadoText: "Los sectores Tren Eléctrico y Bicicleta están en relación de 3 a 2. Calcula el ángulo central (θ) de Bicicleta.",
-                enunciadoLatex: String.raw`\frac{\text{Tren}}{\text{Bici}} = \frac{3k}{2k}`,
-                baseSectors: [
-                    { label: 'Bus', value: 35, color: '#14b8a6' },
-                    { label: 'Bicicleta', value: 16, color: '#f43f5e' },
-                    { label: 'Tren Eléc.', value: 24, color: '#6366f1' },
-                    { label: 'Auto', value: 25, color: '#facc15', isRightAngle: true }
-                ],
-                steps: [
-                    {
-                        propertyText: "Paso 1: Ángulo Recto = 25% del total",
-                        sectorTexts: ['35%', '2k', '3k', '25%'],
-                        latex: String.raw`\begin{aligned} \text{Auto} &= 90^{\circ} \equiv \mathbf{25\%} \\ 35\% + 25\% + 3k + 2k &= 100\% \end{aligned}`,
-                        robotSpeech: "El cuadradito en Auto nos dice que mide 90°, que equivale al 25% del círculo. Sumamos todo e igualamos al 100%."
-                    },
-                    {
-                        propertyText: "Paso 2: Porcentaje de Bicicleta",
-                        sectorTexts: ['35%', '16%', '24%', '25%'],
-                        latex: String.raw`\begin{aligned} 60\% + 5k &= 100\% \implies 5k = 40\% \implies k = \mathbf{8\%} \\ \text{Bicicleta} &= 2(8\%) = \textcolor{#be185d}{\mathbf{16\%}} \end{aligned}`,
-                        robotSpeech: "Despejamos k = 8%. Como Bicicleta es 2k, multiplicamos 2 por 8% y descubrimos que Bicicleta es el 16%."
-                    },
-                    {
-                        propertyText: "Paso 3: Regla de Tres Simple en Aspa",
-                        sectorTexts: ['35%', '16% = θ', '24%', '25%'],
-                        latex: String.raw`\begin{matrix} \textcolor{#1e40af}{\mathbf{100\%}} & \longleftrightarrow & \textcolor{#047857}{\mathbf{360^{\circ}}} \\ \text{ } & \textcolor{#e11d48}{\huge\times} & \text{ } \\ \textcolor{#be185d}{\mathbf{16\%}} & \longleftrightarrow & \textcolor{#7c3aed}{\mathbf{\theta}} \end{matrix}`,
-                        robotSpeech: "Convertimos porcentaje a grados con Regla de Tres: si el 100% son 360°, ¿cuántos grados (θ) serán el 16%?"
-                    },
-                    {
-                        propertyText: "Paso 4: Simplificación y Resultado",
-                        sectorTexts: ['126°', '57,6°', '86,4°', '90°'],
-                        latex: String.raw`\begin{aligned} \theta &= \frac{\cancel{16}^{\textcolor{#e11d48}{8}} \cdot 36\cancel{0}}{\cancel{10\cancel{0}}_{\textcolor{#e11d48}{5}}} = \frac{288}{5} = \mathbf{57,6^{\circ}} \end{aligned}`,
-                        robotSpeech: "Cancelamos un cero, sacamos mitad (8 y 5) y dividimos 288 entre 5. ¡El ángulo central de Bicicleta es 57,6°!"
-                    }
-                ]
+                id: 'ej_4', title: 'Hijos por familia (40 fam.)', enunciado: 'Actividad 04', text: 'Estudio sobre el número de hijos por familia.', points: 100, imageUrl: 'https://images.unsplash.com/photo-1511895426328-dc8714191300?auto=format&fit=crop&w=600&q=80',
+                resolution: {
+                    n: 40, cols: 8, columnsToTest: ['fi', 'hi', 'p'],
+                    rawData: [4, 1, 6, 1, 4, 3, 4, 2, 3, 0, 7, 3, 3, 3, 3, 5, 3, 5, 6, 2, 3, 2, 3, 6, 1, 0, 5, 3, 2, 4, 2, 3, 2, 1, 5, 4, 1, 1, 4, 4],
+                    categories: [{ label: '0 hijos', raw: 0 }, { label: '1 hijo', raw: 1 }, { label: '2 hijos', raw: 2 }, { label: '3 hijos', raw: 3 }, { label: '4 hijos', raw: 4 }, { label: '5 hijos', raw: 5 }, { label: '6 hijos', raw: 6 }, { label: '7 hijos', raw: 7 }],
+                    correctTable: [{ fi: 2, hi: 0.050, p: 5 }, { fi: 6, hi: 0.150, p: 15 }, { fi: 6, hi: 0.150, p: 15 }, { fi: 11, hi: 0.275, p: 27.5 }, { fi: 7, hi: 0.175, p: 17.5 }, { fi: 4, hi: 0.100, p: 10 }, { fi: 3, hi: 0.075, p: 7.5 }, { fi: 1, hi: 0.025, p: 2.5 }],
+                    quiz: [{ q: 'a) ¿Qué porcentaje del total de familias no tiene hijos?', a: 5 }, { q: 'b) ¿Qué porcentaje del total de familias tiene 2 hijos?', a: 15 }, { q: 'c) ¿Qué porcentaje del total de familias tiene 3 hijos?', a: 27.5 }]
+                }
             },
             {
-                id: 5,
-                title: "Reto 5",
-                subtitle: "Campaña Veterinaria",
-                cardBg: "from-[#00b4d8] to-[#0077b6] border-[#90e0ef]",
-                enunciadoText: "El gráfico muestra las mascotas atendidas. Si se atendieron 36 conejos, ¿cuántos perros más que gatos fueron atendidos?",
-                enunciadoLatex: String.raw`\text{Conejos} = 36`,
-                baseSectors: [
-                    { label: 'Perros', value: 48, color: '#3b82f6' },
-                    { label: 'Gatos', value: 28, color: '#f59e0b' },
-                    { label: 'Aves', value: 15, color: '#10b981' },
-                    { label: 'Conejos', value: 9, color: '#ec4899' }
-                ],
-                steps: [
-                    {
-                        propertyText: "Paso 1: Completando el 100%",
-                        sectorTexts: ['48%', '28%', '15%', 'x%'],
-                        latex: String.raw`\begin{aligned} \text{Suma} &= 48\% + 28\% + 15\% = 91\% \\ \text{Conejos} &= 100\% - 91\% = \textcolor{#db2777}{\mathbf{9\%}} \end{aligned}`,
-                        robotSpeech: "Sumamos los porcentajes conocidos (91%). Lo que falta para alcanzar el 100% corresponde a los Conejos: ¡9%!"
-                    },
-                    {
-                        propertyText: "Paso 2: Diferencia (Perros - Gatos)",
-                        sectorTexts: ['48%', '28%', '15%', '9% (36)'],
-                        latex: String.raw`\begin{aligned} \text{Conejos (9\%)} &= 36\text{ mascotas} \\ \text{Perros} - \text{Gatos} &= 48\% - 28\% = \textcolor{#7c3aed}{\mathbf{20\%}} \end{aligned}`,
-                        robotSpeech: "Sabemos que el 9% equivale a 36 conejos. Además, la diferencia entre Perros (48%) y Gatos (28%) es del 20%."
-                    },
-                    {
-                        propertyText: "Paso 3: Regla de Tres Simple en Aspa",
-                        sectorTexts: ['48%', '28%', '15%', '9% (36)'],
-                        latex: String.raw`\begin{matrix} \textcolor{#1e40af}{\mathbf{9\%}} & \longleftrightarrow & \textcolor{#047857}{\mathbf{36\text{ mascotas}}} \\ \text{ } & \textcolor{#e11d48}{\huge\times} & \text{ } \\ \textcolor{#be185d}{\mathbf{20\%}} & \longleftrightarrow & \textcolor{#7c3aed}{\mathbf{x}} \end{matrix}`,
-                        robotSpeech: "Planteamos la Regla de Tres: si el 9% son 36 mascotas, ¿cuántas mascotas (x) serán el 20% de diferencia?"
-                    },
-                    {
-                        propertyText: "Paso 4: Simplificación y Resultado",
-                        sectorTexts: ['192 perros', '112 gatos', '60 aves', '36 conejos'],
-                        latex: String.raw`\begin{aligned} x &= \frac{20 \cdot \cancel{36}^{\textcolor{#e11d48}{4}}}{\cancel{9}_{\textcolor{#e11d48}{1}}} = 20 \cdot 4 = \mathbf{80\text{ perros más}} \end{aligned}`,
-                        robotSpeech: "Simplificamos sacando novena a 36 y 9 (queda 4). Multiplicamos 20 por 4 y obtenemos 80 perros más que gatos."
-                    }
-                ]
+                id: 'ej_5', title: 'Edades de 20 trabajadores', enunciado: 'Actividad 05', text: 'Edades de 20 trabajadores de una empresa.', points: 100, imageUrl: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=600&q=80',
+                resolution: {
+                    n: 20, cols: 7, columnsToTest: ['fi', 'hi', 'p'],
+                    rawData: [26, 25, 30, 28, 32, 40, 22, 32, 28, 26, 28, 25, 20, 39, 42, 28, 35, 28, 23, 20],
+                    categories: [{ label: '20 años', raw: 20 }, { label: '22 años', raw: 22 }, { label: '23 años', raw: 23 }, { label: '25 años', raw: 25 }, { label: '26 años', raw: 26 }, { label: '28 años', raw: 28 }, { label: '30 años', raw: 30 }, { label: '32 años', raw: 32 }, { label: '35 años', raw: 35 }, { label: '39 años', raw: 39 }, { label: '40 años', raw: 40 }, { label: '42 años', raw: 42 }],
+                    correctTable: [{ fi: 2, hi: 0.10, p: 10 }, { fi: 1, hi: 0.05, p: 5 }, { fi: 1, hi: 0.05, p: 5 }, { fi: 2, hi: 0.10, p: 10 }, { fi: 2, hi: 0.10, p: 10 }, { fi: 5, hi: 0.25, p: 25 }, { fi: 1, hi: 0.05, p: 5 }, { fi: 2, hi: 0.10, p: 10 }, { fi: 1, hi: 0.05, p: 5 }, { fi: 1, hi: 0.05, p: 5 }, { fi: 1, hi: 0.05, p: 5 }, { fi: 1, hi: 0.05, p: 5 }],
+                    quiz: [{ q: 'a) ¿Cuántos trabajadores tienen 28 años?', a: 5 }, { q: 'b) ¿Qué porcentaje del total de trabajadores tiene 28 años?', a: 25 }]
+                }
             },
             {
-                id: 6,
-                title: "Reto 6",
-                subtitle: "Presupuesto Familiar",
-                cardBg: "from-[#9b5de5] to-[#7209b7] border-[#e0aaff]",
-                enunciadoText: "La familia Huamán distribuye su ingreso mensual de S/ 4800 según el gráfico. ¿Cuánto más destina a Alimentación que al Ahorro?",
-                enunciadoLatex: String.raw`\text{Total} = \text{S/ } 4800`,
-                baseSectors: [
-                    { label: 'Alimentación', value: 35, color: '#f43f5e' },
-                    { label: 'Ahorro', value: 17.5, color: '#84cc16' },
-                    { label: 'Educación', value: 22.5, color: '#8b5cf6' },
-                    { label: 'Vivienda', value: 25, color: '#06b6d4', isRightAngle: true }
-                ],
-                steps: [
-                    {
-                        propertyText: "Paso 1: Pasando 81° a porcentaje",
-                        sectorTexts: ['35%', 'x%', '81°', '25%'],
-                        latex: String.raw`\begin{aligned} \text{Educación} &= \frac{\cancel{81^{\circ}}^{\textcolor{#e11d48}{9}}}{\cancel{360^{\circ}}_{\textcolor{#e11d48}{40}}} \cdot 100\% = \frac{9 \cdot 5}{2}\% = \mathbf{22,5\%} \end{aligned}`,
-                        robotSpeech: "Vivienda tiene ángulo recto (25%). Pasamos los 81° de Educación a porcentaje simplificando: ¡nos da 22,5%!"
-                    },
-                    {
-                        propertyText: "Paso 2: Hallando Ahorro y Diferencia",
-                        sectorTexts: ['35%', '17,5%', '22,5%', '25%'],
-                        latex: String.raw`\begin{aligned} \text{Ahorro} &= 100\% - (35\% + 25\% + 22,5\%) = \mathbf{17,5\%} \\ \text{Alim.} - \text{Ahorro} &= 35\% - 17,5\% = \textcolor{#be185d}{\mathbf{17,5\%}} \end{aligned}`,
-                        robotSpeech: "Restamos del 100% y hallamos que Ahorro es 17,5%. Y la diferencia entre Alimentación (35%) y Ahorro (17,5%) también es 17,5%."
-                    },
-                    {
-                        propertyText: "Paso 3: Regla de Tres Simple en Aspa",
-                        sectorTexts: ['35%', '17,5%', '22,5%', '25%'],
-                        latex: String.raw`\begin{matrix} \textcolor{#1e40af}{\mathbf{100\%}} & \longleftrightarrow & \textcolor{#047857}{\mathbf{\text{S/ } 4800}} \\ \text{ } & \textcolor{#e11d48}{\huge\times} & \text{ } \\ \textcolor{#be185d}{\mathbf{17,5\%}} & \longleftrightarrow & \textcolor{#7c3aed}{\mathbf{x}} \end{matrix}`,
-                        robotSpeech: "Planteamos la Regla de Tres: si el 100% del ingreso es S/ 4800, ¿cuántos soles (x) serán el 17,5% de diferencia?"
-                    },
-                    {
-                        propertyText: "Paso 4: Simplificación y Resultado",
-                        sectorTexts: ['S/ 1680', 'S/ 840', 'S/ 1080', 'S/ 1200'],
-                        latex: String.raw`\begin{aligned} x &= \frac{17,5 \cdot 48\cancel{00}}{1\cancel{00}} = 17,5 \cdot 48 = \mathbf{\text{S/ } 840} \end{aligned}`,
-                        robotSpeech: "Simplificamos los dos ceros de 4800 con los del 100. Multiplicamos 17,5 por 48 y obtenemos S/ 840."
-                    }
-                ]
+                id: 'ej_6', title: 'Notas de 20 estudiantes', enunciado: 'Actividad 06', text: 'Calificaciones obtenidas por 20 estudiantes de una clase.', points: 100, imageUrl: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=600&q=80',
+                resolution: {
+                    n: 20, cols: 7, columnsToTest: ['fi', 'hi', 'p'],
+                    rawData: [12, 16, 14, 10, 18, 8, 20, 16, 13, 11, 6, 12, 10, 19, 12, 13, 10, 12, 18, 16],
+                    categories: [{ label: 'Nota 06', raw: 6 }, { label: 'Nota 08', raw: 8 }, { label: 'Nota 10', raw: 10 }, { label: 'Nota 11', raw: 11 }, { label: 'Nota 12', raw: 12 }, { label: 'Nota 13', raw: 13 }, { label: 'Nota 14', raw: 14 }, { label: 'Nota 16', raw: 16 }, { label: 'Nota 18', raw: 18 }, { label: 'Nota 19', raw: 19 }, { label: 'Nota 20', raw: 20 }],
+                    correctTable: [{ fi: 1, hi: 0.05, p: 5 }, { fi: 1, hi: 0.05, p: 5 }, { fi: 3, hi: 0.15, p: 15 }, { fi: 1, hi: 0.05, p: 5 }, { fi: 4, hi: 0.20, p: 20 }, { fi: 2, hi: 0.10, p: 10 }, { fi: 1, hi: 0.05, p: 5 }, { fi: 3, hi: 0.15, p: 15 }, { fi: 2, hi: 0.10, p: 10 }, { fi: 1, hi: 0.05, p: 5 }, { fi: 1, hi: 0.05, p: 5 }],
+                    quiz: [{ q: 'a) ¿Cuántos estudiantes están aprobados? (Nota >= 11)', a: 15 }, { q: 'b) ¿Qué porcentaje de estudiantes tiene notas mayores a 15?', a: 35 }]
+                }
             },
             {
-                id: 7,
-                title: "Reto 7",
-                subtitle: "Géneros Literarios",
-                cardBg: "from-[#52b788] to-[#2d6a4f] border-[#95d5b2]",
-                enunciadoText: "Se encuestó a 600 jóvenes sobre su género literario favorito. Calcula cuántos jóvenes prefieren Aventura o Terror.",
-                enunciadoLatex: String.raw`\text{Total} = 600`,
-                baseSectors: [
-                    { label: 'Aventura', value: 20, color: '#14b8a6' },
-                    { label: 'Misterio', value: 30, color: '#f43f5e' },
-                    { label: 'Terror', value: 32, color: '#8b5cf6' },
-                    { label: 'C. Ficción', value: 18, color: '#facc15' }
-                ],
-                steps: [
-                    {
-                        propertyText: "Paso 1: 72° a porcentaje y suma = 100%",
-                        sectorTexts: ['72° = 20%', '(4x-2)%', '(3x+8)%', '(2x+2)%'],
-                        latex: String.raw`\begin{aligned} \text{Aventura} &= \frac{\cancel{72^{\circ}}^{\,1}}{\cancel{360^{\circ}}_{\,5}} \cdot 100\% = \mathbf{20\%} \\ 20 + (4x-2) &+ (3x+8) + (2x+2) = 100 \end{aligned}`,
-                        robotSpeech: "72° es la quinta parte de 360°, es decir, 20%. Ahora sumamos todos los porcentajes e igualamos a 100."
-                    },
-                    {
-                        propertyText: "Paso 2: Hallando x y (Aventura + Terror)",
-                        sectorTexts: ['20%', '30%', '32%', '18%'],
-                        latex: String.raw`\begin{aligned} 9x + 28 &= 100 \implies 9x = 72 \implies \mathbf{x = 8} \\ \text{Av. + Ter.} &= 20\% + 32\% = \textcolor{#be185d}{\mathbf{52\%}} \end{aligned}`,
-                        robotSpeech: "Despejamos x = 8. Reemplazando en Terror obtenemos 32%, y sumado con el 20% de Aventura nos da 52%."
-                    },
-                    {
-                        propertyText: "Paso 3: Regla de Tres Simple en Aspa",
-                        sectorTexts: ['20%', '30%', '32%', '18%'],
-                        latex: String.raw`\begin{matrix} \textcolor{#1e40af}{\mathbf{100\%}} & \longleftrightarrow & \textcolor{#047857}{\mathbf{600\text{ jóv.}}} \\ \text{ } & \textcolor{#e11d48}{\huge\times} & \text{ } \\ \textcolor{#be185d}{\mathbf{52\%}} & \longleftrightarrow & \textcolor{#7c3aed}{\mathbf{y}} \end{matrix}`,
-                        robotSpeech: "Planteamos la Regla de Tres Simple: si el 100% son 600 jóvenes, ¿cuántos jóvenes (y) representan el 52%?"
-                    },
-                    {
-                        propertyText: "Paso 4: Simplificación y Resultado",
-                        sectorTexts: ['120 jóv.', '180 jóv.', '192 jóv.', '108 jóv.'],
-                        latex: String.raw`\begin{aligned} y &= \frac{52 \cdot \cancel{600}^{\textcolor{#e11d48}{6}}}{\cancel{100}_{\textcolor{#e11d48}{1}}} = 52 \cdot 6 = \mathbf{312\text{ jóvenes}} \end{aligned}`,
-                        robotSpeech: "Cancelamos los dos ceros de 600 y 100. Multiplicamos 52 por 6 y obtenemos 312 jóvenes."
-                    }
-                ]
+                id: 'ej_7', title: 'Hijos en 30 familias', enunciado: 'Actividad 07', text: 'Cantidad de hijos por familia en una muestra de 30 familias.', points: 100, imageUrl: 'https://images.unsplash.com/photo-1542044896530-05d85be9b11a?auto=format&fit=crop&w=600&q=80',
+                resolution: {
+                    n: 30, cols: 10, columnsToTest: ['fi', 'hi', 'p'],
+                    rawData: [2, 3, 2, 3, 1, 4, 0, 1, 2, 4, 4, 2, 3, 1, 2, 3, 2, 0, 2, 1, 2, 3, 3, 0, 1, 5, 6, 2, 1, 0],
+                    categories: [{ label: '0 hijos', raw: 0 }, { label: '1 hijo', raw: 1 }, { label: '2 hijos', raw: 2 }, { label: '3 hijos', raw: 3 }, { label: '4 hijos', raw: 4 }, { label: '5 hijos', raw: 5 }, { label: '6 hijos', raw: 6 }],
+                    correctTable: [{ fi: 4, hi: 0.133, p: 13.3 }, { fi: 6, hi: 0.200, p: 20 }, { fi: 9, hi: 0.300, p: 30 }, { fi: 6, hi: 0.200, p: 20 }, { fi: 3, hi: 0.100, p: 10 }, { fi: 1, hi: 0.033, p: 3.3 }, { fi: 1, hi: 0.033, p: 3.3 }],
+                    quiz: [{ q: 'a) ¿Cuál es la mayor cantidad de hijos que tiene una familia?', a: 6 }, { q: 'b) ¿Qué porcentaje de familias tiene 2 hijos?', a: 30 }, { q: 'c) ¿Cuántas familias tienen un hijo?', a: 6 }]
+                }
             },
             {
-                id: 8,
-                title: "Reto 8",
-                subtitle: "Tienda de Zapatillas",
-                cardBg: "from-[#ef476f] to-[#d90429] border-[#ff8fa3]",
-                enunciadoText: "Si se vendieron 45 pares más de la marca A que de la marca C, ¿cuántos pares se vendieron en total entre las marcas B y D?",
-                enunciadoLatex: String.raw`\text{A} - \text{C} = 45\text{ pares}`,
-                baseSectors: [
-                    { label: 'Marca A', value: 135, color: '#14b8a6' },
-                    { label: 'Marca D', value: 35, color: '#8b5cf6' },
-                    { label: 'Marca C', value: 85, color: '#facc15' },
-                    { label: 'Marca B', value: 105, color: '#f43f5e' }
-                ],
-                steps: [
-                    {
-                        propertyText: "Paso 1: Ángulo de la Marca D",
-                        sectorTexts: ['135°', '35°', '85°', '105°'],
-                        latex: String.raw`\begin{aligned} \text{Suma} &= 135^{\circ} + 105^{\circ} + 85^{\circ} = 325^{\circ} \\ \text{Marca D} &= 360^{\circ} - 325^{\circ} = \textcolor{#7c3aed}{\mathbf{35^{\circ}}} \end{aligned}`,
-                        robotSpeech: "Completamos los 360° del círculo restando los tres ángulos conocidos y descubrimos que la Marca D mide 35°."
-                    },
-                    {
-                        propertyText: "Paso 2: Diferencia (A - C) y Suma (B + D)",
-                        sectorTexts: ['135°', '35°', '85°', '105°'],
-                        latex: String.raw`\begin{aligned} \text{A} - \text{C} &= 135^{\circ} - 85^{\circ} = \mathbf{50^{\circ}} \equiv 45\text{ pares} \\ \text{B} + \text{D} &= 105^{\circ} + 35^{\circ} = \textcolor{#be185d}{\mathbf{140^{\circ}}} \end{aligned}`,
-                        robotSpeech: "La diferencia entre A y C es 50° (que equivale a 45 pares). Y la suma de las marcas B y D es 105° + 35° = 140°."
-                    },
-                    {
-                        propertyText: "Paso 3: Regla de Tres Simple en Aspa",
-                        sectorTexts: ['135°', '35°', '85°', '105°'],
-                        latex: String.raw`\begin{matrix} \textcolor{#1e40af}{\mathbf{50^{\circ}}} & \longleftrightarrow & \textcolor{#047857}{\mathbf{45\text{ pares}}} \\ \text{ } & \textcolor{#e11d48}{\huge\times} & \text{ } \\ \textcolor{#be185d}{\mathbf{140^{\circ}}} & \longleftrightarrow & \textcolor{#7c3aed}{\mathbf{x}} \end{matrix}`,
-                        robotSpeech: "Planteamos la Regla de Tres: si 50° corresponden a 45 pares, ¿cuántos pares (x) corresponderán a 140°?"
-                    },
-                    {
-                        propertyText: "Paso 4: Simplificación y Resultado",
-                        sectorTexts: ['121,5 p.', '31,5 p.', '76,5 p.', '94,5 p.'],
-                        latex: String.raw`\begin{aligned} x &= \frac{14\cancel{0} \cdot \cancel{45}^{\textcolor{#e11d48}{9}}}{\cancel{5\cancel{0}}_{\textcolor{#e11d48}{1}}} = 14 \cdot 9 = \mathbf{126\text{ pares}} \end{aligned}`,
-                        robotSpeech: "Eliminamos un cero de 140 y 50, luego sacamos quinta a 45 (9) y a 5 (1). Multiplicamos 14 por 9 = 126 pares."
-                    }
-                ]
-            },
-            {
-                id: 9,
-                title: "Reto 9",
-                subtitle: "Olimpiada Regional",
-                cardBg: "from-[#f77f00] to-[#d62828] border-[#fcbf49]",
-                enunciadoText: "Participaron 800 estudiantes. Si 3/8 de Primaria y 5/9 de Secundaria son mujeres, ¿cuántos varones hay entre Primaria y Secundaria?",
-                enunciadoLatex: String.raw`\text{Total} = 800`,
-                baseSectors: [
-                    { label: 'Primaria', value: 144, color: '#facc15' },
-                    { label: 'Secundaria', value: 162, color: '#ec4899' },
-                    { label: 'Pre', value: 54, color: '#06b6d4' }
-                ],
-                steps: [
-                    {
-                        propertyText: "Paso 1: Regla de Tres para Primaria (144°)",
-                        sectorTexts: ['144° (320)', '45%', '54°'],
-                        latex: String.raw`\begin{aligned} P &= \frac{\cancel{144^{\circ}}^{\textcolor{#e11d48}{2}} \cdot 800}{\cancel{360^{\circ}}_{\textcolor{#e11d48}{5}}} = 2 \cdot 160 = \mathbf{320\text{ estudiantes}} \end{aligned}`,
-                        robotSpeech: "Hallamos el total de Primaria: simplificamos 144 y 360 sacando 72ava (2 y 5) y multiplicamos por 800 = 320."
-                    },
-                    {
-                        propertyText: "Paso 2: Regla de Tres para Secundaria (45%)",
-                        sectorTexts: ['320 est.', '360 est.', '120 est.'],
-                        latex: String.raw`\begin{aligned} S &= \frac{45 \cdot \cancel{800}^{\textcolor{#e11d48}{8}}}{\cancel{100}_{\textcolor{#e11d48}{1}}} = 45 \cdot 8 = \mathbf{360\text{ estudiantes}} \end{aligned}`,
-                        robotSpeech: "Ahora hallamos Secundaria: cancelamos dos ceros de 800 y 100, y multiplicamos 45 por 8 = 360 estudiantes."
-                    },
-                    {
-                        propertyText: "Paso 3: Varones en cada nivel",
-                        sectorTexts: ['Var: 200', 'Var: 160', '120 est.'],
-                        latex: String.raw`\begin{aligned} \text{Varones}_{\text{Pri}} &= \frac{5}{\cancel{8}_{\,1}} \cdot \cancel{320}^{\textcolor{#e11d48}{40}} = \mathbf{200} \quad;\quad \text{Varones}_{\text{Sec}} = \frac{4}{\cancel{9}_{\,1}} \cdot \cancel{360}^{\textcolor{#0284c7}{40}} = \mathbf{160} \end{aligned}`,
-                        robotSpeech: "Si 3/8 de Primaria son mujeres, los 5/8 son varones (200). Y si 5/9 de Secundaria son mujeres, los 4/9 son varones (160)."
-                    },
-                    {
-                        propertyText: "Paso 4: Suma Total de Varones",
-                        sectorTexts: ['200 varones', '160 varones', '120 est.'],
-                        latex: String.raw`\begin{aligned} \text{Total Varones} &= 200 + 160 = \mathbf{360\text{ varones}} \end{aligned}`,
-                        robotSpeech: "Sumamos los 200 varones de Primaria con los 160 varones de Secundaria y obtenemos 360 varones en total."
-                    }
-                ]
-            },
-            {
-                id: 10,
-                title: "Reto 10",
-                subtitle: "Club de Natación",
-                cardBg: "from-[#7209b7] to-[#560bad] border-[#b5179e]",
-                enunciadoText: "En un club de 1200 socios, de los que practican Natación: el 35% nada libre, 1/4 pecho y el resto mariposa. ¿Cuántos nadan mariposa?",
-                enunciadoLatex: String.raw`\text{Total} = 1200`,
-                baseSectors: [
-                    { label: 'Fútbol', value: 35, color: '#10b981' },
-                    { label: 'Vóley', value: 10, color: '#8b5cf6' },
-                    { label: 'Tenis', value: 25, color: '#f97316', isRightAngle: true },
-                    { label: 'Natación', value: 30, color: '#06b6d4' }
-                ],
-                steps: [
-                    {
-                        propertyText: "Paso 1: Porcentaje de Natación",
-                        sectorTexts: ['126° = 35%', '10%', '25%', '30%'],
-                        latex: String.raw`\begin{aligned} \text{Fútbol} &= \frac{\cancel{126^{\circ}}^{\,7}}{\cancel{360^{\circ}}_{\,20}} \cdot 100\% = \mathbf{35\%} \quad;\quad \text{Tenis} = \mathbf{25\%} \\ \text{Natación} &= 100\% - 70\% = \textcolor{#0284c7}{\mathbf{30\%}} \end{aligned}`,
-                        robotSpeech: "Pasamos 126° a porcentaje (35%) y Tenis tiene ángulo recto (25%). Restando del 100% hallamos que Natación es 30%."
-                    },
-                    {
-                        propertyText: "Paso 2: Total de socios en Natación",
-                        sectorTexts: ['420 soc.', '120 soc.', '300 soc.', '360 nad.'],
-                        latex: String.raw`\begin{aligned} N &= \frac{30 \cdot \cancel{1200}^{\textcolor{#e11d48}{12}}}{\cancel{100}_{\textcolor{#e11d48}{1}}} = \mathbf{360\text{ nadadores}} \end{aligned}`,
-                        robotSpeech: "Hallamos cuántos socios practican Natación: simplificamos dos ceros y multiplicamos 30 por 12 = 360."
-                    },
-                    {
-                        propertyText: "Paso 3: Porcentaje de Estilo Mariposa",
-                        sectorTexts: ['35%', '10%', '25%', 'Mariposa: 40%'],
-                        latex: String.raw`\begin{aligned} \text{Libre} &= 35\% \quad ; \quad \text{Pecho} = \frac{1}{4} = 25\% \\ \text{Mariposa} &= 100\% - (35\% + 25\%) = \textcolor{#7c3aed}{\mathbf{40\%\text{ de }360}} \end{aligned}`,
-                        robotSpeech: "De los 360 nadadores: Libre es 35% y Pecho es 1/4 (25%). El resto nada estilo Mariposa: 100% - 60% = 40%."
-                    },
-                    {
-                        propertyText: "Paso 4: Cálculo Final y Simplificación",
-                        sectorTexts: ['420 soc.', '120 soc.', '300 soc.', 'Mariposa: 144'],
-                        latex: String.raw`\begin{aligned} M &= \frac{4\cancel{0} \cdot 36\cancel{0}}{1\cancel{00}} = 4 \cdot 36 = \mathbf{144\text{ socios}} \end{aligned}`,
-                        robotSpeech: "Calculamos el 40% de 360: cancelamos los dos ceros de arriba con el 100 de abajo y multiplicamos 4 por 36 = 144 socios."
-                    }
-                ]
+                id: 'ej_8', title: 'Edades de 20 estudiantes', enunciado: 'Actividad 08', text: 'Registro de edades de 20 estudiantes de una clase.', points: 100, imageUrl: 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=600&q=80',
+                resolution: {
+                    n: 20, cols: 7, columnsToTest: ['fi', 'hi', 'p'],
+                    rawData: [12, 11, 13, 13, 12, 12, 13, 12, 12, 11, 11, 12, 13, 12, 10, 10, 12, 11, 13, 12],
+                    categories: [{ label: '10 años', raw: 10 }, { label: '11 años', raw: 11 }, { label: '12 años', raw: 12 }, { label: '13 años', raw: 13 }],
+                    correctTable: [{ fi: 2, hi: 0.10, p: 10 }, { fi: 4, hi: 0.20, p: 20 }, { fi: 9, hi: 0.45, p: 45 }, { fi: 5, hi: 0.25, p: 25 }],
+                    quiz: [{ q: 'a.1) ¿Cuál es la menor edad de los estudiantes?', a: 10 }, { q: 'a.2) ¿Cuál es la mayor edad de los estudiantes?', a: 13 }, { q: 'b) ¿Qué porcentaje del total de estudiantes tiene 12 años?', a: 45 }]
+                }
             }
         ];
 
-        const MathDisplay = memo(({ latex, className = "" }) => {
-            const containerRef = useRef(null);
-            useEffect(() => {
-                if (containerRef.current && window.katex) {
-                    try {
-                        window.katex.render(latex, containerRef.current, {
-                            displayMode: true, throwOnError: false, strict: false, trust: true
-                        });
-                    } catch (e) {
-                        containerRef.current.innerText = latex;
-                    }
-                }
-            }, [latex]);
-
-            return (
-                <div className={`relative w-full flex justify-center items-center overflow-x-auto scrollbar-hide ${className}`}>
-                    <div ref={containerRef} className="w-full text-center py-1" />
-                </div>
-            );
-        });
-
-        // Gráfico Circular Grande y Claro
-        const PieChart = memo(({ baseSectors, sectorTexts, selectedSector, onSelectSector }) => {
-            const size = 300;
-            const radius = 136; // Ocupa casi todo el viewBox sin cortarse al explotar una tajada
-            const center = size / 2;
-            const total = baseSectors.reduce((sum, item) => sum + item.value, 0);
-            let currentAngle = -Math.PI / 2;
-
-            return (
-                <div className="relative w-full h-full flex items-center justify-center">
-                    <svg 
-                        viewBox={`0 0 ${size} ${size}`} 
-                        className="w-full h-full max-w-[230px] sm:max-w-[310px] md:max-w-[370px] max-h-full aspect-square drop-shadow-[0_10px_20px_rgba(0,0,0,0.18)] overflow-visible"
-                    >
-                        {baseSectors.map((slice, index) => {
-                            const angle = (slice.value / total) * Math.PI * 2;
-                            const isRightAngle = slice.isRightAngle && Math.abs(angle - Math.PI / 2) < 0.08;
-                            const x1 = center + radius * Math.cos(currentAngle);
-                            const y1 = center + radius * Math.sin(currentAngle);
-                            const x2 = center + radius * Math.cos(currentAngle + angle);
-                            const y2 = center + radius * Math.sin(currentAngle + angle);
-                            const largeArc = angle > Math.PI ? 1 : 0;
-
-                            const d = `M ${center} ${center} L ${x1} ${y1} A ${radius} ${radius} 0 ${largeArc} 1 ${x2} ${y2} Z`;
-
-                            const midAngle = currentAngle + angle / 2;
-                            const labelRadius = angle < 0.65 ? radius * 0.73 : radius * 0.60;
-                            const tx = center + labelRadius * Math.cos(midAngle);
-                            const ty = center + labelRadius * Math.sin(midAngle);
-
-                            const isSelected = selectedSector === index;
-                            const offsetDist = isSelected ? 12 : 0;
-                            const ox = offsetDist * Math.cos(midAngle);
-                            const oy = offsetDist * Math.sin(midAngle);
-
-                            let rightAnglePath = null;
-                            if (isRightAngle) {
-                                const sq = 20;
-                                const rx1 = center + sq * Math.cos(currentAngle);
-                                const ry1 = center + sq * Math.sin(currentAngle);
-                                const rx2 = center + sq * Math.cos(currentAngle) + sq * Math.cos(currentAngle + angle);
-                                const ry2 = center + sq * Math.sin(currentAngle) + sq * Math.sin(currentAngle + angle);
-                                const rx3 = center + sq * Math.cos(currentAngle + angle);
-                                const ry3 = center + sq * Math.sin(currentAngle + angle);
-                                rightAnglePath = `M ${rx1} ${ry1} L ${rx2} ${ry2} L ${rx3} ${ry3}`;
-                            }
-
-                            currentAngle += angle;
-                            const dynamicText = sectorTexts && sectorTexts[index] !== undefined ? sectorTexts[index] : '';
-
-                            return (
-                                <g 
-                                    key={index} 
-                                    className="sector-group"
-                                    style={{ transform: `translate(${ox}px, ${oy}px)` }}
-                                    onClick={() => onSelectSector(index)}
-                                >
-                                    <path 
-                                        d={d} 
-                                        fill={slice.color} 
-                                        className="sector-path" 
-                                        style={{ strokeWidth: isSelected ? 4.5 : 3, stroke: isSelected ? '#0f172a' : '#ffffff' }}
-                                    />
-                                    {rightAnglePath && (
-                                        <path d={rightAnglePath} fill="rgba(255,255,255,0.7)" stroke="#0f172a" strokeWidth="2.5" strokeLinejoin="miter" />
-                                    )}
-                                    <text x={tx} y={dynamicText ? ty - 9 : ty} className="chart-label-title">
-                                        {slice.label}
-                                    </text>
-                                    {dynamicText && (
-                                        <text x={tx} y={ty + 11} className="chart-label-value">
-                                            {dynamicText}
-                                        </text>
-                                    )}
-                                </g>
-                            );
-                        })}
-                    </svg>
-                </div>
-            );
-        });
-
-        const FloatingBackground = memo(() => {
-            const symbols = ['+', '-', '×', '÷', '=', '✨', '360°', 'θ', '%', '📊'];
-            const elements = Array.from({ length: 18 }).map((_, i) => ({
-                id: i, symbol: symbols[i % symbols.length], left: `${(i * 6) % 96}%`,
-                animationDuration: `${12 + (i % 8) * 2}s`, animationDelay: `-${(i * 1.3)}s`,
-                fontSize: `${1.2 + (i % 3) * 0.7}rem`, opacity: 0.12
-            }));
-            return (
-                <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-                    {elements.map((el) => (
-                        <div key={el.id} className="absolute text-white font-black animate-floatUp select-none" style={{ left: el.left, bottom: '-15%', fontSize: el.fontSize, opacity: el.opacity, animationDuration: el.animationDuration, animationDelay: el.animationDelay }}>
-                            {el.symbol}
-                        </div>
-                    ))}
-                </div>
-            );
-        });
-
-        const Confetti = memo(() => {
-            const colors = ['#fde047', '#60a5fa', '#f472b6', '#34d399', '#a78bfa', '#ff5722'];
-            const pieces = Array.from({ length: 80 }).map((_, i) => ({
-                id: i, left: `${50 + (Math.random() * 20 - 10)}%`, color: colors[i % colors.length],
-                tx: `${(Math.random() - 0.5) * 650}px`, ty: `${(Math.random() - 1) * 650}px`, rot: `${Math.random() * 720}deg`, delay: `${Math.random() * 0.15}s`
-            }));
-            return (
-                <div className="absolute inset-0 pointer-events-none z-50 flex items-center justify-center overflow-hidden">
-                    {pieces.map((p) => (
-                        <div key={p.id} className="absolute w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full animate-confettiExplosion" style={{ backgroundColor: p.color, '--tx': p.tx, '--ty': p.ty, '--rot': p.rot, animationDelay: p.delay, left: p.left, top: '50%' }} />
-                    ))}
-                </div>
-            );
-        });
-
-        const RobotAssistant = ({ step, maxSteps, onSpeak }) => {
-            const isFinalStep = step >= maxSteps;
-            return (
-                <button 
-                    onClick={onSpeak}
-                    title="Toca para escuchar al robot"
-                    className={`relative flex flex-col items-center select-none cursor-pointer group active:scale-90 transition-transform shrink-0 ${isFinalStep ? 'animate-robotJump' : 'animate-robotFloat'}`}
-                >
-                    <div className="relative z-0 flex flex-col items-center translate-y-1">
-                        <div className={`w-3 h-3 rounded-full shadow-[0_0_8px_currentColor] z-10 ${isFinalStep ? 'text-emerald-400 bg-emerald-400' : 'text-yellow-400 bg-yellow-400 animate-pulse'}`}></div>
-                        <div className="w-1.5 h-3 bg-slate-300"></div>
-                    </div>
-                    <div className="relative z-10 w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-white to-slate-200 rounded-2xl border-[3px] border-indigo-400 shadow-md flex flex-col items-center justify-center p-1 group-hover:border-pink-500 transition-colors">
-                        <div className="w-full h-full bg-slate-900 rounded-xl flex flex-col items-center justify-center p-1 border border-indigo-500">
-                            {isFinalStep ? (
-                                <div className="w-full flex justify-between px-1.5"><div className="w-3 h-1.5 bg-emerald-400 rounded-t-full"></div><div className="w-3 h-1.5 bg-emerald-400 rounded-t-full"></div></div>
-                            ) : (
-                                <div className="w-full flex justify-between px-1.5"><div className="w-2.5 h-2.5 bg-cyan-400 rounded-full animate-pulse"></div><div className="w-2.5 h-2.5 bg-cyan-400 rounded-full animate-pulse"></div></div>
-                            )}
-                            <div className={`w-4 sm:w-5 h-2 bg-rose-400 rounded-full mt-1.5 ${step > 0 && !isFinalStep ? 'animate-ping' : ''}`}></div>
-                        </div>
-                    </div>
-                </button>
-            );
+        let state = {
+            view: 'home', playerName: '',
+            completedChallenges: [], gameScores: {}, currentChallengeIdx: 0,
+            botMsg: "¡Hola! Soy el asistente de TuProfe20 MathLab. Escribe tu nombre arriba para salir a la pizarra y ganar tus 100 puntos.",
+            botThinking: false, botHappy: false, botTalking: true,
+            tableState: [], activeCell: {r:0, c:''}, foundItems: [], matrixError: null,
+            inputValue: "", cellError: null, isTableDone: false,
+            quizAnswers: [], quizStatus: [], gameScore: 100, isLevelComplete: false
         };
 
-        function App() {
-            const [view, setView] = useState('home');
-            const [exIdx, setExIdx] = useState(0);
-            const [step, setStep] = useState(0);
-            const [isMuted, setIsMuted] = useState(false);
-            const [selectedSector, setSelectedSector] = useState(null);
-
-            const currentExercise = STATISTICAL_EXERCISES[exIdx];
-            const maxSteps = currentExercise.steps.length - 1;
-            const currentStepData = currentExercise.steps[step];
-            const totalValue = currentExercise.baseSectors.reduce((s, item) => s + item.value, 0);
-
-            const startExercise = (index) => {
-                AudioController.play('swoosh');
-                setExIdx(index);
-                setStep(0);
-                setSelectedSector(null);
-                setView('lab');
-            };
-
-            const handleSelectSector = (index) => {
-                AudioController.play('slice');
-                setSelectedSector(prev => prev === index ? null : index);
-            };
-
-            const nextStep = () => {
-                if (step < maxSteps) {
-                    const next = step + 1;
-                    setStep(next);
-                    if (next === maxSteps) AudioController.play('success');
-                    else AudioController.play('pop');
-                } else {
-                    if (exIdx < STATISTICAL_EXERCISES.length - 1) {
-                        AudioController.play('swoosh');
-                        setExIdx(exIdx + 1);
-                        setStep(0);
-                        setSelectedSector(null);
-                    } else {
-                        AudioController.play('swoosh');
-                        setView('home');
-                    }
-                }
-            };
-
-            const prevStep = () => {
-                if (step > 0) {
-                    setStep(step - 1);
-                    AudioController.play('pop-reverse');
-                }
-            };
-
-            const toggleMute = () => {
-                setIsMuted(AudioController.toggleMute());
-            };
-
-            // PORTADA (Retos 1 al 10)
-            if (view === 'home') {
-                return (
-                    <div className="w-screen h-[100dvh] bg-gradient-to-br from-[#312e81] via-[#6d28d9] to-[#be185d] flex flex-col items-center justify-start p-3 sm:p-6 relative font-fun overflow-y-auto overflow-x-hidden scrollbar-hide">
-                        <FloatingBackground />
-                        
-                        <div className="w-full max-w-6xl z-20 flex items-center justify-between mb-4 sm:mb-8 mt-1 shrink-0">
-                            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl border-2 border-yellow-300 bg-white/15 backdrop-blur-md text-yellow-300 font-black tracking-wider uppercase shadow-md text-sm sm:text-lg">
-                                <Rocket className="w-5 h-5 text-yellow-300" /> TuProfe20 Lab
-                            </div>
-                            <button onClick={toggleMute} className="p-2.5 sm:p-3 rounded-2xl bg-white/20 border-2 border-white/30 backdrop-blur-md text-white hover:bg-white/30 transition-all active:scale-95">
-                                {isMuted ? <VolumeX className="w-6 h-6" /> : <Volume2 className="w-6 h-6" />}
-                            </button>
-                        </div>
-
-                        <div className="relative z-10 text-center w-full max-w-6xl flex flex-col items-center">
-                            <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-white mb-2 drop-shadow-[0_4px_0_rgba(0,0,0,0.3)] tracking-tight leading-tight uppercase">
-                                Gráficos Estadísticos <span className="text-yellow-300 underline decoration-wavy decoration-pink-400">II</span>
-                            </h1>
-                            <p className="text-sm sm:text-xl text-purple-100 mb-6 sm:mb-8 font-bold max-w-3xl px-2">
-                                ¡Domina el análisis de sectores circulares, regla de tres y ángulos paso a paso! 📊✨
-                            </p>
-
-                            <div className="w-full grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 pb-8">
-                                {STATISTICAL_EXERCISES.map((ex, idx) => (
-                                    <button
-                                        key={ex.id}
-                                        onClick={() => startExercise(idx)}
-                                        className={`group text-left p-3.5 sm:p-4 rounded-2xl sm:rounded-[1.5rem] bg-gradient-to-br ${ex.cardBg} border-[3px] hover:-translate-y-1.5 active:scale-95 transition-all flex flex-col justify-between relative overflow-hidden shadow-lg min-h-[7.8rem] sm:min-h-[9rem]`}
-                                    >
-                                        <div className="flex items-center justify-between w-full">
-                                            <span className="bg-black/30 text-white text-xs sm:text-sm font-black px-2.5 py-0.5 rounded-lg uppercase tracking-wider">
-                                                {ex.title}
-                                            </span>
-                                            <span className="text-white/90 text-xs sm:text-sm font-black">#{ex.id}</span>
-                                        </div>
-                                        <div className="my-2 text-white font-black text-sm sm:text-lg leading-snug drop-shadow">
-                                            {ex.subtitle}
-                                        </div>
-                                        <div className="flex items-center justify-between pt-2 border-t border-white/25 w-full">
-                                            <span className="text-xs text-white font-extrabold">Ver análisis</span>
-                                            <span className="bg-yellow-400 text-slate-900 w-6 h-6 rounded-full flex items-center justify-center font-black group-hover:translate-x-1 transition-transform text-xs shadow">
-                                                ➔
-                                            </span>
-                                        </div>
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-                );
+        // Generar Fondo Flotante Dinámico
+        function initFloatingBackground() {
+            const symbols = ['📊', '📈', '📋', '∑', '%', 'fi', 'hi', '✨', '🧠', '🎯', '⭐', '100'];
+            const container = document.getElementById('floating-bg');
+            container.innerHTML = '';
+            for (let i = 0; i < 32; i++) {
+                const el = document.createElement('div');
+                el.className = "absolute text-white font-black animate-floatUp select-none drop-shadow-lg";
+                el.innerText = symbols[Math.floor(Math.random() * symbols.length)];
+                el.style.left = `${Math.random() * 100}%`;
+                el.style.bottom = '-15%';
+                el.style.fontSize = `${1.2 + Math.random() * 2.5}rem`;
+                el.style.opacity = `${0.12 + Math.random() * 0.22}`;
+                el.style.animationDuration = `${10 + Math.random() * 14}s`;
+                el.style.animationDelay = `-${Math.random() * 20}s`;
+                container.appendChild(el);
             }
-
-            const activeSlice = selectedSector !== null ? currentExercise.baseSectors[selectedSector] : null;
-            const activeDeg = activeSlice ? Math.round((activeSlice.value / totalValue) * 360 * 10) / 10 : 0;
-            const activePct = activeSlice ? Math.round((activeSlice.value / totalValue) * 100 * 10) / 10 : 0;
-
-            return (
-                <div className="w-screen h-[100dvh] bg-gradient-to-br from-[#1e1b4b] via-[#4c1d95] to-[#be185d] text-slate-800 flex flex-col p-1 sm:p-2.5 relative font-fun overflow-hidden">
-                    <FloatingBackground />
-                    {step === maxSteps && <Confetti />}
-
-                    {/* Barra Superior */}
-                    <div className="shrink-0 relative z-10 w-full max-w-7xl mx-auto flex justify-between items-center mb-1 sm:mb-2 px-1 gap-2">
-                        <button onClick={() => { AudioController.play('swoosh'); setView('home'); }} className="flex items-center justify-center px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl bg-white/15 border-2 border-white/30 backdrop-blur-md text-white font-black hover:bg-white/25 transition-all active:scale-95 text-xs sm:text-base shrink-0">
-                            <Home className="w-4 h-4 sm:w-5 sm:h-5 sm:mr-1.5" />
-                            <span className="hidden sm:inline">Portada</span>
-                        </button>
-
-                        <div className="flex items-center gap-1 sm:gap-1.5 bg-black/35 p-1 rounded-xl border border-white/20 backdrop-blur-md overflow-x-auto max-w-[72vw] scrollbar-hide">
-                            {STATISTICAL_EXERCISES.map((ex, i) => (
-                                <button
-                                    key={ex.id}
-                                    onClick={() => startExercise(i)}
-                                    className={`w-7 h-7 sm:w-9 sm:h-9 rounded-lg font-black text-xs sm:text-base transition-all shrink-0 ${exIdx === i ? 'bg-yellow-400 text-slate-900 scale-105 shadow-[0_0_12px_rgba(250,204,21,0.8)]' : 'text-white/85 hover:bg-white/20'}`}
-                                >
-                                    {ex.id}
-                                </button>
-                            ))}
-                        </div>
-
-                        <button onClick={toggleMute} className="p-1.5 sm:p-2 rounded-xl bg-white/15 border-2 border-white/30 text-white hover:bg-white/25 transition-all active:scale-95 shrink-0">
-                            {isMuted ? <VolumeX className="w-5 h-5 sm:w-6 sm:h-6" /> : <Volume2 className="w-5 h-5 sm:w-6 sm:h-6" />}
-                        </button>
-                    </div>
-
-                    {/* Pizarra Principal de Alto Aprovechamiento */}
-                    <div className="flex-1 min-h-0 relative z-10 w-full max-w-7xl mx-auto bg-white rounded-2xl sm:rounded-[1.8rem] border-4 sm:border-[6px] border-slate-100 shadow-2xl flex flex-col overflow-hidden">
-                        
-                        {/* Enunciado Grande y Destacado */}
-                        <div className="shrink-0 bg-slate-900 border-b-4 border-indigo-500 px-3 py-2 sm:px-6 sm:py-3 flex flex-col md:flex-row items-center justify-between gap-1.5 sm:gap-4">
-                            <div className="flex items-center gap-2 shrink-0">
-                                <span className="bg-yellow-400 text-slate-900 font-black text-xs sm:text-sm px-2.5 py-0.5 rounded-md uppercase tracking-wider">
-                                    {currentExercise.title}
-                                </span>
-                                <span className="text-purple-200 font-extrabold text-xs sm:text-sm bg-white/10 px-2.5 py-0.5 rounded-md">
-                                    {currentExercise.subtitle}
-                                </span>
-                            </div>
-                            <p className="text-white font-black text-xs sm:text-base md:text-lg text-center md:text-left leading-snug flex-1">
-                                {currentExercise.enunciadoText}
-                            </p>
-                            <div className="math-enunciado shrink-0 bg-black/40 px-3 py-1 rounded-xl border border-white/25">
-                                <MathDisplay latex={currentExercise.enunciadoLatex} />
-                            </div>
-                        </div>
-
-                        {/* Zona Central: Gráfico Grande (Izquierda/Arriba) y Desarrollo Continuo Grande (Derecha/Abajo) */}
-                        <div className="flex-1 min-h-0 w-full flex flex-col md:flex-row items-stretch justify-between p-2 sm:p-4 gap-2 sm:gap-4 relative bg-slate-50 overflow-hidden">
-                            
-                            {/* Panel del Gráfico Circular (46% en PC, 46% alto en móvil) */}
-                            <div className="w-full md:w-[46%] h-[46%] md:h-full flex flex-col items-center justify-between z-10 shrink-0 bg-white rounded-2xl border-2 border-slate-200 p-2 sm:p-4 shadow-sm">
-                                <div className="flex-1 min-h-0 w-full flex items-center justify-center">
-                                    <PieChart 
-                                        baseSectors={currentExercise.baseSectors} 
-                                        sectorTexts={currentStepData.sectorTexts}
-                                        selectedSector={selectedSector}
-                                        onSelectSector={handleSelectSector}
-                                    />
-                                </div>
-
-                                {/* Barra inferior interactiva del gráfico */}
-                                <div className="shrink-0 w-full pt-1 flex flex-wrap items-center justify-center gap-1.5">
-                                    {activeSlice ? (
-                                        <div 
-                                            onClick={() => setSelectedSector(null)}
-                                            className="animate-jellyPop cursor-pointer flex items-center gap-2 px-3 py-1 rounded-xl bg-slate-900 text-white text-xs sm:text-sm font-black shadow-md"
-                                        >
-                                            <span className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: activeSlice.color }}></span>
-                                            <span>{activeSlice.label}:</span>
-                                            <span className="text-yellow-300">{activeDeg}°</span>
-                                            <span className="text-cyan-300">({activePct}%)</span>
-                                            <span className="text-white/60 text-[10px] ml-1">✕</span>
-                                        </div>
-                                    ) : (
-                                        currentExercise.baseSectors.map((s, idx) => (
-                                            <button
-                                                key={idx}
-                                                onClick={() => handleSelectSector(idx)}
-                                                className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-indigo-50 text-slate-800 text-xs sm:text-sm font-extrabold border border-slate-300 transition-all active:scale-95"
-                                            >
-                                                <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: s.color }}></span>
-                                                {s.label}
-                                            </button>
-                                        ))
-                                    )}
-                                </div>
-                            </div>
-
-                            {/* Panel de Desarrollo Matemático Grande (54% en PC, 54% alto en móvil) */}
-                            <div className="w-full md:w-[54%] h-[54%] md:h-full flex flex-col items-center justify-center z-10 bg-white rounded-2xl border-2 border-slate-200 p-2.5 sm:p-5 shadow-sm overflow-y-auto scrollbar-hide">
-                                
-                                {/* Título del Paso */}
-                                <div key={`badge-${exIdx}-${step}`} className="mb-2 sm:mb-4 animate-jellyPop text-center shrink-0">
-                                    <span className={`inline-flex items-center gap-2 px-4 py-1.5 sm:px-5 sm:py-2 rounded-xl font-black text-xs sm:text-lg shadow-sm border-2 ${step === maxSteps ? 'bg-amber-400 text-slate-900 border-yellow-500' : 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white border-indigo-400'}`}>
-                                        <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" /> 
-                                        <span>{currentStepData.propertyText}</span>
-                                    </span>
-                                </div>
-
-                                {/* Ecuación Principal Grande */}
-                                <div key={`current-${exIdx}-${step}`} className="w-full flex-1 flex items-center justify-center animate-jellyPop">
-                                    <div className={`transition-all px-3 py-3 sm:px-6 sm:py-6 w-full text-center rounded-2xl flex items-center justify-center ${step === maxSteps ? 'bg-[#fde047] border-4 sm:border-[5px] border-[#eab308] shadow-[0_10px_30px_rgba(234,179,8,0.35)] math-final' : 'bg-slate-50/80 border-2 border-slate-200/80 math-current'}`}>
-                                        <MathDisplay latex={currentStepData.latex} />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Panel del Robot Asistente con Texto Grande */}
-                        <div className="shrink-0 bg-white w-full px-3 py-2 sm:px-6 sm:py-3 flex items-center gap-3 sm:gap-5 border-t-2 border-slate-100 z-10">
-                            <RobotAssistant 
-                                step={step} 
-                                maxSteps={maxSteps} 
-                                onSpeak={() => AudioController.speak(currentStepData.robotSpeech)}
-                            />
-                            <div className="flex-1 text-xs sm:text-base md:text-lg font-extrabold text-slate-800 leading-snug bg-indigo-50/90 px-3.5 py-2 sm:px-5 sm:py-3 rounded-2xl border-2 border-indigo-100 flex items-center justify-between gap-3">
-                                <div key={`speech-${exIdx}-${step}`} className="animate-slideInRight flex-1">
-                                    {currentStepData.robotSpeech}
-                                </div>
-                                <button 
-                                    onClick={() => AudioController.speak(currentStepData.robotSpeech)}
-                                    title="Escuchar explicación"
-                                    className="shrink-0 px-3 py-1.5 rounded-xl bg-indigo-600 text-white text-xs sm:text-sm font-black hover:bg-indigo-700 active:scale-95 transition-all shadow-sm"
-                                >
-                                    🔊 Voz
-                                </button>
-                            </div>
-                        </div>
-
-                        {/* Botones de Navegación Inferiores */}
-                        <div className="shrink-0 bg-gradient-to-b from-[#eadef7] to-[#d6c1f0] p-2 sm:p-3 w-full flex flex-col items-center border-t-2 border-white z-10">
-                            <div className="flex justify-center items-stretch w-full max-w-4xl gap-2.5 sm:gap-4 h-11 sm:h-13">
-                                <button
-                                    onClick={prevStep}
-                                    disabled={step === 0}
-                                    className="flex-[0.8] bg-[#d8b4fe] border-b-4 border-[#a855f7] text-[#581c87] rounded-xl font-black text-sm sm:text-lg flex items-center justify-center gap-1 active:border-b-0 active:translate-y-1 disabled:opacity-40 transition-all hover:bg-[#e9d5ff]"
-                                >
-                                    <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 stroke-[3.5px]" />
-                                    <span>Atrás</span>
-                                </button>
-
-                                <div className="bg-[#9333ea] text-white font-black px-4 sm:px-6 text-sm sm:text-lg flex items-center justify-center rounded-xl border-b-4 border-[#6b21a8] shadow-inner whitespace-nowrap">
-                                    Paso {step + 1}/{maxSteps + 1}
-                                </div>
-
-                                <button
-                                    onClick={nextStep}
-                                    className={`flex-[1.8] border-b-4 text-white rounded-xl font-black text-sm sm:text-xl flex items-center justify-center gap-2 active:border-b-0 active:translate-y-1 transition-all shadow-sm hover:brightness-110 ${
-                                        step === maxSteps
-                                            ? 'bg-gradient-to-r from-[#10b981] to-[#047857] border-[#065f46] animate-pulse'
-                                            : 'bg-gradient-to-r from-[#f59e0b] to-[#ea580c] border-[#c2410c]'
-                                    }`}
-                                >
-                                    <span>
-                                        {step < maxSteps
-                                            ? '¡Siguiente Paso!'
-                                            : exIdx < STATISTICAL_EXERCISES.length - 1
-                                            ? `Ir al Reto ${exIdx + 2}`
-                                            : '¡Volver a la Portada!'}
-                                    </span>
-                                    <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 stroke-[3.5px]" />
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            );
         }
 
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
+        function pokeRobot() {
+            AudioController.play('levelUp');
+            setBotState(`¡Vamos con todo ${state.playerName || 'campeón(a)'}! Recuerda que cada ejercicio vale 100 puntos.`, false, true, true);
+        }
+
+        const checkValueMatch = (inputStr, expectedNum) => {
+            const clean = String(inputStr).replace('%', '').replace(',', '.').trim();
+            const inputVal = parseFloat(clean);
+            if (isNaN(inputVal)) return false;
+            return Math.abs(inputVal - expectedNum) <= 0.02;
+        };
+
+        function setBotState(msg, isThinking=false, isHappy=false, isTalking=true) {
+            state.botMsg = msg; state.botThinking = isThinking; state.botHappy = isHappy; state.botTalking = isTalking;
+            
+            const container = document.getElementById('robot-container');
+            const antenna = document.getElementById('robot-antenna');
+            const eyes = document.getElementById('robot-eyes');
+            const mouthWrap = document.getElementById('robot-mouth-wrap');
+            const armL = document.getElementById('robot-arm-l');
+            const armR = document.getElementById('robot-arm-r');
+            
+            container.className = `shrink-0 absolute -top-16 sm:relative sm:-top-0 left-3 sm:left-0 drop-shadow-xl scale-90 sm:scale-100 relative flex flex-col items-center cursor-pointer hover:scale-110 transition-transform ${isThinking ? 'animate-robotThinkTilt' : isHappy ? 'animate-robotJump' : 'animate-robotFloat'}`;
+            
+            antenna.className = `w-4 h-4 rounded-full shadow-[0_0_14px_currentColor] z-10 transition-colors duration-300 border-2 border-white ${isHappy ? 'text-emerald-400 bg-emerald-400' : isThinking ? 'text-amber-500 bg-amber-500 animate-ping' : 'text-yellow-400 bg-yellow-400 animate-pulse'}`;
+            
+            armL.className = `absolute top-1/2 -left-3 w-4 h-7 bg-amber-400 border-[3px] border-indigo-500 rounded-full z-0 origin-top transition-transform duration-300 ${isThinking ? 'rotate-[135deg]' : isHappy ? 'rotate-[150deg] animate-pulse' : isTalking ? 'animate-robotTalkArmL' : 'rotate-45'}`;
+            armR.className = `absolute top-1/2 -right-3 w-4 h-7 bg-amber-400 border-[3px] border-indigo-500 rounded-full z-0 origin-top transition-transform duration-300 ${isThinking ? '-rotate-45' : isHappy ? '-rotate-[150deg] animate-pulse' : isTalking ? 'animate-robotTalkArmR' : '-rotate-45'}`;
+
+            if (isThinking) {
+                eyes.innerHTML = '<div class="w-3.5 h-1.5 bg-amber-400 rounded-full mt-2 rotate-[18deg]"></div><div class="w-3.5 h-1.5 bg-amber-400 rounded-full mt-2 -rotate-[18deg]"></div>';
+                mouthWrap.innerHTML = '<div class="w-3 h-3 bg-amber-300 rounded-full mt-1.5 translate-x-1"></div>';
+            } else if (isHappy) {
+                eyes.innerHTML = '<div class="w-4 h-2.5 bg-emerald-400 rounded-t-full mt-1 shadow-[0_0_8px_#34d399]"></div><div class="w-4 h-2.5 bg-emerald-400 rounded-t-full mt-1 shadow-[0_0_8px_#34d399]"></div>';
+                mouthWrap.innerHTML = '<div class="w-7 h-4 bg-rose-400 rounded-b-full mt-1 shadow-[0_0_8px_#fb7185]"></div>';
+            } else {
+                eyes.innerHTML = '<div class="w-4 h-4 bg-yellow-400 rounded-full animate-bounce shadow-[0_0_8px_#facc15]"></div><div class="w-4 h-4 bg-yellow-400 rounded-full animate-bounce shadow-[0_0_8px_#facc15]"></div>';
+                mouthWrap.innerHTML = '<div class="w-5 h-3.5 bg-rose-400 rounded-b-full animate-pulse shadow-[0_0_6px_#fb7185]"></div>';
+            }
+
+            const msgEl = document.getElementById('bot-msg');
+            const msgWrap = document.getElementById('bot-msg-wrapper');
+            msgEl.innerText = msg;
+            msgEl.className = (msg.includes('Ups') || msg.includes('descuento') || msg.includes('Revisa')) ? 'text-rose-600 drop-shadow-sm' : 'text-indigo-950 drop-shadow-sm';
+            
+            msgWrap.classList.remove('animate-slideInRight');
+            void msgWrap.offsetWidth;
+            msgWrap.classList.add('animate-slideInRight');
+        }
+
+        function toggleMute() {
+            const muted = AudioController.toggleMute();
+            document.getElementById('mute-icon').setAttribute('data-lucide', muted ? 'volume-x' : 'volume-2');
+            lucide.createIcons();
+        }
+
+        function handleStart() {
+            const val = document.getElementById('input-player-name').value.trim();
+            if(val !== '') {
+                state.playerName = val;
+                document.getElementById('player-name-display').innerText = val;
+                document.getElementById('player-badge').classList.remove('hidden');
+                AudioController.play('swoosh');
+                changeView('map');
+                setBotState(`¡Excelente, ${val}! Elige cualquiera de los 8 ejercicios en el mapa para ganar tus 100 puntos.`, false, true);
+            } else {
+                AudioController.play('wrong');
+                setBotState("¡Ups! Escribe tu nombre arriba para poder registrar tus 100 puntos en la pizarra.", true);
+            }
+        }
+
+        function changeView(newView) {
+            document.getElementById(`view-${state.view}`).classList.add('hidden');
+            document.getElementById(`view-${newView}`).classList.remove('hidden');
+            state.view = newView;
+
+            if (newView === 'map' || newView === 'challenge') {
+                document.getElementById('top-nav').classList.remove('hidden');
+                document.getElementById('nav-text').innerText = newView === 'map' ? 'Cambiar Alumno' : 'Volver al Mapa';
+                document.getElementById('nav-icon').setAttribute('data-lucide', newView === 'map' ? 'user' : 'map');
+                if (newView === 'challenge') document.getElementById('reward-badge').classList.remove('hidden');
+                else document.getElementById('reward-badge').classList.add('hidden');
+            } else {
+                document.getElementById('top-nav').classList.add('hidden');
+            }
+
+            if(newView === 'map') renderMap();
+            if(newView === 'challenge') renderChallenge();
+            
+            lucide.createIcons();
+        }
+
+        function navBack() {
+            AudioController.play('swoosh');
+            document.getElementById('overlay-complete').classList.add('hidden');
+            document.getElementById('confetti-container').innerHTML = '';
+            changeView(state.view === 'map' ? 'home' : 'map');
+        }
+
+        function renderMap() {
+            const grid = document.getElementById('challenges-grid');
+            grid.innerHTML = '';
+            
+            CHALLENGES.forEach((c, i) => {
+                const isCompleted = state.completedChallenges.includes(c.id);
+                const score = state.gameScores[c.id] !== undefined ? state.gameScores[c.id] : "-";
+                
+                const btn = document.createElement('button');
+                btn.className = `flex flex-col items-stretch rounded-[2rem] transition-all duration-300 text-left relative overflow-hidden group border-[3px] backdrop-blur-2xl ${isCompleted ? 'bg-emerald-500/30 border-emerald-300 shadow-lg hover:bg-emerald-500/40' : 'bg-white/15 border-white/30 hover:bg-white/25 hover:-translate-y-2 hover:shadow-[0_15px_30px_rgba(0,0,0,0.3)]'}`;
+                btn.onmouseenter = () => AudioController.play('hover');
+                btn.onclick = () => { AudioController.play('swoosh'); state.currentChallengeIdx = i; initChallenge(); changeView('challenge'); };
+                
+                btn.innerHTML = `
+                    <div class="w-full h-28 sm:h-32 relative shrink-0">
+                        <img src="${c.imageUrl}" class="w-full h-full object-cover opacity-85 group-hover:opacity-100 transition-opacity group-hover:scale-105 duration-500" />
+                        <div class="absolute inset-0 bg-gradient-to-t from-indigo-950/90 via-indigo-950/20 to-transparent"></div>
+                        <span class="absolute top-3 left-3 bg-indigo-600/90 text-yellow-300 font-black text-[10px] uppercase tracking-widest px-3 py-1 rounded-full border border-indigo-300 shadow">${c.enunciado}</span>
+                        <div class="absolute top-3 right-3 w-9 h-9 rounded-xl flex items-center justify-center shadow-lg backdrop-blur-md border-2 border-white/50 transition-transform group-hover:scale-110 ${isCompleted ? 'bg-emerald-500 text-white' : 'bg-amber-400 text-indigo-950'}">
+                            <i data-lucide="${isCompleted ? 'check-circle' : 'play'}" class="w-5 h-5 ${!isCompleted ? 'ml-0.5 fill-current' : ''}"></i>
+                        </div>
+                    </div>
+                    <div class="p-4 flex flex-col flex-1 relative z-10">
+                        <h3 class="text-base sm:text-lg font-black mb-1 leading-tight ${isCompleted ? 'text-yellow-300' : 'text-white'} drop-shadow">${c.title}</h3>
+                        <p class="text-xs text-white/85 font-bold leading-snug mb-3 flex-1">${c.text}</p>
+                        <div class="flex justify-between items-center mt-auto pt-2.5 border-t border-white/20">
+                            <span class="px-3 py-1.5 rounded-xl font-black text-xs flex items-center justify-center gap-1.5 w-full border ${isCompleted ? 'bg-emerald-500 text-white border-emerald-200 shadow' : 'bg-black/25 border-white/20 text-yellow-300'}">
+                                <i data-lucide="star" class="w-3.5 h-3.5 fill-current"></i> ${isCompleted ? 'Logrado: ' + score + ' PTS' : 'Premio: ' + c.points + ' PTS'}
+                            </span>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(btn);
+            });
+
+            document.getElementById('score-display').innerText = `${state.completedChallenges.length}/${CHALLENGES.length}`;
+            if(state.completedChallenges.length > 0) document.getElementById('btn-report').classList.remove('hidden');
+            else document.getElementById('btn-report').classList.add('hidden');
+        }
+
+        function initChallenge() {
+            const c = CHALLENGES[state.currentChallengeIdx].resolution;
+            state.tableState = c.correctTable.map(row => {
+                let res = {...row}; c.columnsToTest.forEach(col => res[col] = ""); return res;
+            });
+            state.activeCell = {r: 0, c: c.columnsToTest[0]};
+            state.foundItems = []; state.matrixError = null; state.inputValue = ""; state.cellError = null;
+            state.isTableDone = false; state.quizAnswers = Array(c.quiz.length).fill(''); state.quizStatus = Array(c.quiz.length).fill(null);
+            state.gameScore = CHALLENGES[state.currentChallengeIdx].points; state.isLevelComplete = false;
+            updateLiveScoreBadge();
+        }
+
+        function updateLiveScoreBadge() {
+            const el = document.getElementById('live-score-badge');
+            if (el) el.innerText = state.gameScore;
+        }
+
+        // Generar palitos de conteo (IIII) agrupados de 5 en 5
+        function formatTally(count) {
+            if (!count || count <= 0) return '<span class="text-slate-300">-</span>';
+            let html = '<div class="inline-flex flex-wrap items-center justify-center gap-1.5">';
+            const groupsOf5 = Math.floor(count / 5);
+            const remainder = count % 5;
+            for (let g = 0; g < groupsOf5; g++) {
+                html += `<span class="inline-block bg-amber-100 text-amber-800 border border-amber-300 px-1.5 py-0.5 rounded font-mono font-black text-xs tracking-tighter line-through decoration-rose-500 decoration-2">IIII</span>`;
+            }
+            if (remainder > 0) {
+                html += `<span class="inline-block bg-amber-50 text-amber-700 border border-amber-200 px-1.5 py-0.5 rounded font-mono font-black text-xs tracking-widest">${'I'.repeat(remainder)}</span>`;
+            }
+            html += '</div>';
+            return html;
+        }
+
+        function renderChallenge() {
+            const ch = CHALLENGES[state.currentChallengeIdx];
+            const c = ch.resolution;
+            
+            document.getElementById('challenge-img').src = ch.imageUrl;
+            document.getElementById('challenge-enunciado').innerText = ch.enunciado + " • Tabla de Frecuencias";
+            document.getElementById('challenge-title').innerText = ch.title;
+            document.getElementById('matrix-n').innerText = "n = " + c.n;
+
+            const ws = document.getElementById('challenge-workspace');
+            ws.className = "flex-1 flex flex-col items-center w-full relative max-w-7xl mx-auto transition-all duration-500 opacity-100 scale-100";
+            
+            if(!state.isTableDone) {
+                document.getElementById('panel-matrix').classList.remove('hidden');
+                document.getElementById('panel-quiz').classList.add('hidden');
+                
+                const grid = document.getElementById('matrix-grid');
+                grid.style.gridTemplateColumns = `repeat(${c.cols}, minmax(0, 1fr))`;
+                grid.innerHTML = '';
+                c.rawData.forEach((v, i) => {
+                    const btn = document.createElement('button');
+                    btn.id = `grid-btn-${i}`;
+                    btn.innerText = v;
+                    btn.onmouseenter = () => AudioController.play('hover');
+                    btn.onclick = () => handleMatrixClick(i);
+                    grid.appendChild(btn);
+                });
+                updateMatrixGridClasses();
+            } else {
+                document.getElementById('panel-matrix').classList.add('hidden');
+                document.getElementById('panel-quiz').classList.remove('hidden');
+                renderQuiz();
+            }
+
+            renderTable();
+            updateBotChallengeState();
+        }
+
+        function updateBotChallengeState() {
+            if(state.isTableDone) return;
+            const c = CHALLENGES[state.currentChallengeIdx].resolution;
+            const col = state.activeCell.c;
+            const cat = c.categories[state.activeCell.r];
+            let msg = "";
+            if (col === 'fi') msg = `¡A contar, ${state.playerName}! Busca y haz clic en todos los números '${cat.raw}' en el Escáner de Datos para hallar su frecuencia (fi).`;
+            else if (col === 'hi') msg = `Frecuencia Relativa (hi) de ${cat.label}: Divide su frecuencia (${c.correctTable[state.activeCell.r].fi}) entre el total (n=${c.n}).`;
+            else if (col === 'p') msg = `Frecuencia Porcentual (hi%) de ${cat.label}: Multiplica la frecuencia relativa por 100.`;
+            setBotState(msg, false, false, true);
+        }
+
+        function handleMatrixClick(idx) {
+            if (state.activeCell.c !== 'fi' || state.isTableDone) { AudioController.play('wrong'); return; }
+            if (state.foundItems.includes(idx)) return;
+            
+            const c = CHALLENGES[state.currentChallengeIdx].resolution;
+            const targetRawVal = c.categories[state.activeCell.r].raw;
+            
+            if (c.rawData[idx] === targetRawVal) {
+                AudioController.play('correct');
+                state.foundItems.push(idx);
+                const currentCount = state.foundItems.filter(i => c.rawData[i] === targetRawVal).length;
+                if (currentCount === c.correctTable[state.activeCell.r].fi) {
+                    AudioController.play('levelUp');
+                    state.tableState[state.activeCell.r]['fi'] = currentCount;
+                    moveToNextCell();
+                }
+                updateMatrixGridClasses();
+                renderTable();
+            } else {
+                AudioController.play('wrong'); 
+                state.gameScore = Math.max(0, state.gameScore - 5);
+                updateLiveScoreBadge();
+                
+                const btn = document.getElementById(`grid-btn-${idx}`);
+                btn.className = "min-h-[36px] sm:min-h-[44px] rounded-xl font-black text-xs sm:text-base flex items-center justify-center transition-all duration-300 select-none border-b-4 bg-rose-500 text-white border-rose-700 animate-wiggle shadow-md";
+                setTimeout(() => updateMatrixGridClasses(), 500);
+                setBotState(`¡Ups! Ese número no es '${targetRawVal}'. Te descuento 5 puntos (Puntaje actual: ${state.gameScore} XP).`, true);
+            }
+        }
+
+        function updateMatrixGridClasses() {
+            const c = CHALLENGES[state.currentChallengeIdx].resolution;
+            c.rawData.forEach((v, i) => {
+                const btn = document.getElementById(`grid-btn-${i}`);
+                if(!btn) return;
+                const isFound = state.foundItems.includes(i);
+                if(isFound) {
+                    btn.className = "min-h-[36px] sm:min-h-[44px] rounded-xl font-black text-xs sm:text-base flex items-center justify-center transition-all duration-300 select-none border-b-4 bg-amber-400 text-indigo-950 border-amber-600 shadow-lg scale-105 z-10";
+                } else {
+                    btn.className = "min-h-[36px] sm:min-h-[44px] rounded-xl font-black text-xs sm:text-base flex items-center justify-center transition-all duration-300 select-none border-b-4 bg-slate-100 text-slate-700 border-slate-300 hover:bg-indigo-50 hover:text-indigo-700 hover:border-indigo-300 hover:-translate-y-1 hover:shadow-md active:translate-y-[2px] active:border-b-2";
+                }
+            });
+        }
+
+        function handleCellSubmit() {
+            if(state.isTableDone || state.inputValue === "") return;
+            const c = CHALLENGES[state.currentChallengeIdx].resolution;
+            const currentCorrectVal = c.correctTable[state.activeCell.r][state.activeCell.c];
+            
+            if (checkValueMatch(state.inputValue, currentCorrectVal)) {
+                AudioController.play('correct');
+                state.tableState[state.activeCell.r][state.activeCell.c] = currentCorrectVal;
+                setBotState(`¡Cálculo impecable, ${state.playerName}!`, false, true);
+                moveToNextCell();
+            } else {
+                AudioController.play('wrong'); 
+                state.gameScore = Math.max(0, state.gameScore - 5);
+                updateLiveScoreBadge();
+                state.cellError = `${state.activeCell.r}-${state.activeCell.c}`;
+                renderTable();
+                setTimeout(() => { state.cellError = null; renderTable(); }, 600);
+                setBotState(`¡Ups! Revisa tu cálculo. Te descuento 5 puntos (Puntaje actual: ${state.gameScore} XP).`, true);
+            }
+        }
+
+        function moveToNextCell() {
+            const c = CHALLENGES[state.currentChallengeIdx].resolution;
+            for (let col of c.columnsToTest) { 
+                for (let r = 0; r < c.categories.length; r++) { 
+                    if (state.tableState[r][col] === "") { 
+                        state.activeCell = { r, c: col }; 
+                        state.inputValue = "";
+                        renderTable();
+                        updateBotChallengeState();
+                        setTimeout(()=> document.getElementById('cell-input')?.focus(), 50);
+                        return; 
+                    }
+                }
+            }
+            state.isTableDone = true; AudioController.play('levelUp');
+            setBotState(`¡Tabla completada al 100%! Ahora responde las preguntas finales de la actividad.`, false, true);
+            renderChallenge();
+        }
+
+        function renderTable() {
+            const c = CHALLENGES[state.currentChallengeIdx].resolution;
+            const colsDef = [
+                { key: 'fi', label: 'Frecuencia (fi)', color: 'text-indigo-600' },
+                ...(c.columnsToTest.includes('hi') ? [{ key: 'hi', label: 'F. Relativa (hi)', color: 'text-rose-500' }] : []),
+                ...(c.columnsToTest.includes('p') ? [{ key: 'p', label: 'Porcentaje (hi%)', color: 'text-emerald-600' }] : [])
+            ];
+
+            const thead = document.getElementById('table-head');
+            thead.innerHTML = `
+                <tr class="bg-indigo-50 text-indigo-900 border-b-2 border-indigo-100 uppercase tracking-wider text-[10px] sm:text-xs">
+                    <th class="p-2.5 sm:p-3 font-black text-left pl-4">Variable (xi)</th>
+                    <th class="p-2 font-black text-amber-700">Conteo</th>
+                    ${colsDef.map(col => `<th class="p-2 font-black transition-colors ${state.activeCell.c === col.key && !state.isTableDone ? 'text-indigo-700 bg-yellow-200/70' : ''}">${col.label}</th>`).join('')}
+                </tr>
+            `;
+
+            const tbody = document.getElementById('table-body');
+            tbody.innerHTML = c.categories.map((cat, r) => {
+                const currentCount = state.tableState[r]['fi'] !== "" 
+                    ? state.tableState[r]['fi'] 
+                    : state.foundItems.filter(i => c.rawData[i] === cat.raw).length;
+
+                return `
+                <tr class="border-b border-slate-100 transition-colors ${state.activeCell.r === r && !state.isTableDone ? 'bg-yellow-50/90' : 'hover:bg-slate-50'}">
+                    <td class="p-2 sm:p-3 text-slate-800 font-black text-left pl-4 text-xs sm:text-base whitespace-nowrap">
+                        ${state.activeCell.r === r && !state.isTableDone ? '<i data-lucide="target" class="w-4 h-4 inline mr-1.5 text-indigo-600 animate-bounce"></i>' : ''}
+                        ${cat.label}
+                    </td>
+                    <td class="p-1.5 sm:p-2 text-center align-middle">
+                        ${formatTally(currentCount)}
+                    </td>
+                    ${colsDef.map(col => {
+                        const isActive = state.activeCell.r === r && state.activeCell.c === col.key;
+                        const isError = state.cellError === `${r}-${col.key}`;
+                        const val = state.tableState[r][col.key];
+                        const isFilled = val !== "";
+                        let displayVal = val;
+                        if (isActive && col.key === 'fi') displayVal = currentCount;
+                        
+                        if (isActive && !state.isTableDone) {
+                            return `
+                            <td class="p-1 relative">
+                                <div class="p-1 h-full w-full flex items-center justify-center gap-1.5 ${isError ? 'animate-wiggle' : ''}">
+                                    ${col.key === 'fi' 
+                                        ? `<div class="w-11 h-9 bg-gradient-to-br from-amber-400 to-orange-500 text-white rounded-xl font-black text-base sm:text-lg flex items-center justify-center shadow-md animate-jellyPop">${displayVal}</div>`
+                                        : `<input id="cell-input" type="text" value="${state.inputValue}" oninput="AudioController.play('type'); state.inputValue=this.value" onkeydown="if(event.key==='Enter') handleCellSubmit()" class="w-full max-w-[68px] bg-white border-b-[4px] rounded-xl font-black text-center py-1 text-sm sm:text-base outline-none transition-all shadow-inner ${isError ? 'border-rose-500 text-rose-500 bg-rose-50' : 'border-indigo-300 focus:border-indigo-600 text-indigo-700'}" placeholder="?">
+                                           <button onclick="handleCellSubmit()" class="bg-indigo-600 text-white p-1.5 rounded-xl border-b-[3px] border-indigo-800 active:border-b-0 active:translate-y-[3px] shadow hover:bg-indigo-500"><i data-lucide="arrow-right" class="w-4 h-4"></i></button>`
+                                    }
+                                </div>
+                            </td>`;
+                        } else {
+                            return `<td class="p-1.5 relative"><div class="font-black text-sm sm:text-lg ${isFilled ? col.color : 'text-slate-300'}">${isFilled ? val + (col.key==='p' ?'%' : '') : "-"}</div></td>`;
+                        }
+                    }).join('')}
+                </tr>`;
+            }).join('');
+
+            const tfoot = document.getElementById('table-foot');
+            tfoot.innerHTML = `
+                <tr class="bg-slate-800 font-black text-white text-xs sm:text-base">
+                    <td class="p-2.5 sm:p-3 text-right text-yellow-300 pr-4" colspan="2">TOTAL</td>
+                    <td class="p-2.5 sm:p-3 text-indigo-300">${c.n}</td>
+                    ${c.columnsToTest.includes('hi') ? `<td class="p-2.5 sm:p-3 text-rose-300">1.00</td>` : ''}
+                    ${c.columnsToTest.includes('p') ? `<td class="p-2.5 sm:p-3 text-emerald-300">100%</td>` : ''}
+                </tr>`;
+            
+            lucide.createIcons();
+            setTimeout(()=> document.getElementById('cell-input')?.focus(), 10);
+        }
+
+        function renderQuiz() {
+            const c = CHALLENGES[state.currentChallengeIdx].resolution;
+            const list = document.getElementById('quiz-list');
+            list.innerHTML = c.quiz.map((q, idx) => {
+                const isCorrect = state.quizStatus[idx] === 'correct';
+                const isWrong = state.quizStatus[idx] === 'wrong';
+                return `
+                <div class="p-4 rounded-[1.5rem] border-2 transition-colors shadow-sm ${isCorrect ? 'bg-emerald-50 border-emerald-300' : isWrong ? 'bg-rose-50 border-rose-300 animate-wiggle' : 'bg-slate-50 border-slate-200'}">
+                    <p class="text-sm sm:text-base font-extrabold mb-3 flex gap-2 leading-snug ${isCorrect ? 'text-emerald-800' : 'text-slate-700'}">
+                        <span class="text-indigo-500 shrink-0 mt-0.5"><i data-lucide="activity" class="w-5 h-5"></i></span> ${q.q}
+                    </p>
+                    <div class="flex gap-2.5">
+                        <input type="text" id="quiz-input-${idx}" value="${state.quizAnswers[idx]}" oninput="AudioController.play('type'); state.quizAnswers[${idx}]=this.value" onkeydown="if(event.key==='Enter') handleQuizCheck(${idx})" ${isCorrect ? 'disabled' : ''} placeholder="Tu respuesta..."
+                            class="flex-1 bg-white border-b-[4px] rounded-xl py-2 px-4 text-lg font-black text-center focus:outline-none transition-all ${isCorrect ? 'border-emerald-400 text-emerald-600' : isWrong ? 'border-rose-400 text-rose-500' : 'border-slate-300 focus:border-indigo-500 text-indigo-700'}">
+                        ${!isCorrect ? 
+                            `<button onclick="handleQuizCheck(${idx})" onmouseenter="AudioController.play('hover')" class="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2 rounded-xl font-black transition-all border-b-[4px] border-indigo-800 active:border-b-0 active:translate-y-[4px] shadow uppercase text-xs sm:text-sm">Validar</button>` 
+                            : `<div class="bg-emerald-100 text-emerald-600 px-5 py-2 rounded-xl font-black flex items-center justify-center gap-2 border-2 border-emerald-300"><i data-lucide="check" class="w-5 h-5"></i></div>`
+                        }
+                    </div>
+                </div>`;
+            }).join('');
+            lucide.createIcons();
+        }
+
+        function handleQuizCheck(idx) {
+            const c = CHALLENGES[state.currentChallengeIdx].resolution;
+            if(state.quizAnswers[idx] === "") return;
+            const isCorrect = checkValueMatch(state.quizAnswers[idx], c.quiz[idx].a);
+            
+            if (isCorrect) {
+                AudioController.play('correct'); 
+                state.quizStatus[idx] = 'correct'; 
+                renderQuiz();
+                if (state.quizStatus.every(s => s === 'correct')) {
+                    setTimeout(() => completeLevel(), 450);
+                } else {
+                    setBotState(`¡Muy bien, ${state.playerName}! Vamos por la siguiente pregunta.`, false, true);
+                }
+            } else {
+                AudioController.play('wrong'); 
+                state.gameScore = Math.max(0, state.gameScore - 5);
+                updateLiveScoreBadge();
+                state.quizStatus[idx] = 'wrong'; 
+                renderQuiz();
+                setBotState(`¡Ups! Respuesta incorrecta. Te descuento 5 puntos (Puntaje actual: ${state.gameScore} XP).`, true);
+                setTimeout(() => { state.quizStatus[idx] = null; renderQuiz(); }, 600);
+            }
+        }
+
+        function completeLevel() {
+            state.isLevelComplete = true; AudioController.play('win');
+            const ch = CHALLENGES[state.currentChallengeIdx];
+            state.gameScores[ch.id] = state.gameScore;
+            
+            if (!state.completedChallenges.includes(ch.id)) state.completedChallenges.push(ch.id);
+            document.getElementById('score-display').innerText = `${state.completedChallenges.length}/${CHALLENGES.length}`;
+
+            const isPerfect = state.gameScore === ch.points;
+            if (isPerfect) setBotState(`¡Increíble, ${state.playerName}! ¡Has conseguido 100 puntos sin ningún error!`, false, true);
+            else setBotState(`¡Muy buen trabajo, ${state.playerName}! Has conseguido ${state.gameScore} puntos en esta actividad.`, false, true);
+
+            document.getElementById('challenge-workspace').className = "flex-1 flex flex-col items-center w-full relative max-w-7xl mx-auto transition-all duration-500 opacity-30 blur-sm pointer-events-none";
+            document.getElementById('overlay-complete').classList.remove('hidden');
+            
+            document.getElementById('complete-modal').className = `w-full max-w-2xl p-6 sm:p-10 rounded-[3rem] flex flex-col items-center justify-center text-center animate-jellyPop overflow-y-auto shadow-2xl relative z-10 ${isPerfect ? 'metallic-gold' : 'metallic-silver'}`;
+            document.getElementById('complete-badge').className = `relative z-10 px-6 py-2 rounded-full mb-4 border-2 shadow-sm backdrop-blur-sm ${isPerfect ? 'text-yellow-900 bg-white/50 border-yellow-200' : 'text-slate-900 bg-white/50 border-white'}`;
+            document.getElementById('complete-title').innerHTML = `<i data-lucide="${isPerfect ? 'award' : 'Sparkles'}" class="w-6 h-6"></i> ${isPerfect ? '¡PUNTAJE PERFECTO!' : '¡ACTIVIDAD COMPLETADA!'}`;
+            document.getElementById('complete-student-heading').className = `relative z-10 text-3xl sm:text-5xl font-black mb-2 leading-tight uppercase ${isPerfect ? 'metallic-text-gold text-yellow-950' : 'metallic-text-silver text-slate-800'}`;
+            document.getElementById('complete-name').innerText = state.playerName;
+            document.getElementById('complete-score').innerText = `${state.gameScore} PUNTOS`;
+            document.getElementById('complete-desc').innerText = isPerfect ? `¡Impecable, ${state.playerName}! Resolviste el ${ch.enunciado} sin ningún error.` : `¡Buen esfuerzo en el ${ch.enunciado}, ${state.playerName}!`;
+
+            triggerConfetti();
+            lucide.createIcons();
+        }
+
+        function showResult() {
+            AudioController.play('win');
+            const MAX_POINTS = CHALLENGES.reduce((acc, curr) => acc + curr.points, 0);
+            const totalScore = Object.values(state.gameScores).reduce((acc, curr) => acc + curr, 0);
+            const isPerfect = totalScore === MAX_POINTS;
+
+            document.getElementById('result-name').innerText = state.playerName;
+            document.getElementById('result-score').innerText = totalScore;
+            
+            triggerConfetti();
+            setBotState(`¡Felicitaciones ${state.playerName}! Aquí tienes tu reporte general de la clase.`, false, true);
+            changeView('result');
+        }
+
+        function resetGame() {
+            AudioController.play('swoosh');
+            state.completedChallenges = [];
+            state.gameScores = {};
+            state.playerName = '';
+            document.getElementById('player-badge').classList.add('hidden');
+            document.getElementById('input-player-name').value = '';
+            document.getElementById('confetti-container').innerHTML = '';
+            changeView('home');
+            setBotState("¡Hola! Soy el asistente de TuProfe20 MathLab. Escribe tu nombre arriba para salir a la pizarra y ganar tus 100 puntos.", false, false, true);
+        }
+
+        function downloadReport() {
+            AudioController.play('correct');
+            const MAX_POINTS = CHALLENGES.reduce((acc, curr) => acc + curr.points, 0);
+            const totalScore = Object.values(state.gameScores).reduce((acc, curr) => acc + curr, 0);
+            const date = new Date().toLocaleDateString('es-PE', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+            
+            let report = `=======================================\n      REPORTE DE LOGROS ESTADÍSTICOS   \n          TuProfe20 MathLab            \n=======================================\n\nESTUDIANTE: ${state.playerName}\nFECHA: ${date}\n\n=======================================\nPUNTAJE TOTAL: ${totalScore} / ${MAX_POINTS} PUNTOS\n=======================================\n\nDETALLE POR EJERCICIO:\n---------------------------------------\n`;
+            
+            CHALLENGES.forEach((t, i) => { 
+                const sc = state.gameScores[t.id] !== undefined ? `${state.gameScores[t.id]} / ${t.points} PUNTOS` : 'Pendiente';
+                report += `Ejercicio ${i + 1}: ${t.title}\nResultado: ${sc}\n\n`; 
+            });
+            report += `---------------------------------------\n¡Excelente participación en clase de Matemática!\n`;
+            
+            const blob = new Blob([report], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob); 
+            const link = document.createElement('a');
+            link.href = url; 
+            link.download = `Reporte_${state.playerName.replace(/\s+/g, '_')}_Estadistica.txt`;
+            document.body.appendChild(link); link.click(); document.body.removeChild(link); URL.revokeObjectURL(url);
+        }
+
+        function triggerConfetti() {
+            const colors = ['#fde047', '#60a5fa', '#f472b6', '#34d399', '#a78bfa', '#ff5722'];
+            const container = document.getElementById('confetti-container');
+            container.innerHTML = '';
+            for(let i=0; i<140; i++) {
+                const el = document.createElement('div');
+                const left = `${50 + (Math.random() * 20 - 10)}%`;
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                const tx = `${(Math.random() - 0.5) * 850}px`;
+                const ty = `${(Math.random() - 1) * 850}px`;
+                const rot = `${Math.random() * 720}deg`;
+                const delay = `${Math.random() * 0.2}s`;
+                
+                el.className = "absolute w-4 h-4 sm:w-5 sm:h-5 rounded-full animate-confettiExplosion shadow-sm";
+                el.style.backgroundColor = color;
+                el.style.setProperty('--tx', tx);
+                el.style.setProperty('--ty', ty);
+                el.style.setProperty('--rot', rot);
+                el.style.animationDelay = delay;
+                el.style.left = left;
+                el.style.top = '50%';
+                container.appendChild(el);
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            initFloatingBackground();
+            lucide.createIcons();
+        });
     </script>
 </body>
 </html>
